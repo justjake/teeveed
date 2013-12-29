@@ -1,4 +1,3 @@
-# A sample Gemfile
 source "https://rubygems.org"
 
 # faraday handles API requests to Wit.ai
@@ -8,7 +7,14 @@ gem 'faraday_middleware', '~>0.8.0'
 # we webapp now
 gem 'sinatra'
 gem 'haml'
-gem 'active_record' # w/o rails: I'm not ready for MVC and huge config
+
+# database stuff - no Rails for me kthx
+gem 'jdbc-sqlite3'
+gem 'data_mapper'
+gem 'dm-sqlite-adapter'
+
+# used for class_attribute
+gem 'activesupport'
 
 # filesystem scanner
 gem 'listen', '~> 2.0'
