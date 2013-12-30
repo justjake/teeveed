@@ -27,7 +27,7 @@ DataMapper.finalize
 DataMapper.auto_migrate!
 
 # the daemon itself
-module Teeveed
+module TeeveeDaemon
 
   # the WebRemote is a simple webapp that dispatches actions based
   # on user input from a webform. it is intended to be used via dictation
@@ -117,7 +117,7 @@ module Teeveed
 end
 
 # start the webserver for the remote in a thread
-cli = Teeveed::CLI.new
+cli = TeeveeDaemon::CLI.new
 path_to_index = TEEVEED_HOME + cli.data
 row = cli.index(path_to_index)
 p "indexed #{path_to_index} "
@@ -125,7 +125,7 @@ cli.store = row
 
 
 web = Thread.new do
-  Teeveed::Remote.run!
+  TeeveeDaemon::Remote.run!
 end
 
 # start pry-remote in new thread
