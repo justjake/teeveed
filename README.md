@@ -19,11 +19,34 @@ TODO: tests or something
 - index needs to respond to natural-language searches
     - few spelling mistakes, mostly word transpositions
 - deleted items should be pruned regularly
+- delegte music indexing and search to Spotify
 
 #### Strategy
 
 *DataMapper + Postgres + Listen* for indexing a media library and extracting
 rudamentry element information from pathnames
+
+On indexer startup, the index database is rebuilt from scratch, to eliminate
+stale indexes. This is fine to do, as `time find /mnt/storage/{Movies,Television,Books} > /dev/null`
+shows that crawling these directories won't be too slow.
+
+In addition to rebuilding the index on application boot, all index queries will have
+the following protection run on them (idealized implementation)
+
+```ruby
+# Array<Media> returned in ranked order from best to worst match
+results = root.search(:title => "the good the bad the ugly", :sense => :watch)
+results.each do |hit|
+    path = Pathname.new(root.path) + hit.relative_path
+    if not path.exist?
+        hit.delete!
+        next
+    end
+
+    path = path.realpath.to_s
+    return Result.new(hit, path)
+end
+```
 
 ### Natural Language Interface
 
