@@ -1,3 +1,4 @@
+require 'set'
 require 'pathname'
 
 module Teevee
@@ -15,10 +16,10 @@ module Teevee
       # root path
       attr_reader :path
 
-      def initialize(path)
+      def initialize(path, sections = [])
         @path = Pathname.new(path).realpath.to_s.freeze
         @closed = false
-        @sections = Set.new
+        @sections = Set.new(sections)
       end
 
       def finalize!
@@ -29,13 +30,12 @@ module Teevee
       # initialize and add a new library section
       def section(media_subclass)
         @sections.add media_subclass
-        media_subclass.library = self
       end
 
       # True if the given path is in this root
       def in_root?(path)
         fp = Pathname.new(path).realpath.to_s
-        fp.starts_with? path
+        fp.start_with? path
       end
 
       # TODO replace with an exception type
@@ -51,7 +51,7 @@ module Teevee
           return full_path[path.length..-1]
         end
 
-        path_not_under_error other
+        path_not_under_error full_path
       end
 
       # import a file into the library. basic algorithm:
@@ -62,7 +62,7 @@ module Teevee
       #     - is this path already in the database?
       #     - cool, import using section.new section.regex.match(relative_path)
       # TODO: log all import operations
-      def import_file(full_path)
+      def index_file(full_path)
         # only files that exist
         fp = Pathname.new(full_path).realpath
 
@@ -78,17 +78,17 @@ module Teevee
 
         @sections.each do |s|
           if s.prefix =~ rp and s.suffix =~ rp
-            return s.import_relative(rp)
+            return s.index_path(rp)
           end
         end
 
         # abject failure
-        return false
+        false
       end
 
       # import all the files first before recursing into directories
       # breadth-first
-      def import_directory(full_path)
+      def index_directory(full_path)
         fp = Pathname.new(full_path).realpath
 
         # only directories
@@ -100,6 +100,7 @@ module Teevee
         end
 
         # breadth-first
+        index_entries = []
         dirs = []
 
         fp.each_child do |child|
@@ -108,28 +109,29 @@ module Teevee
             next
           end
 
-          self.import_file(child)
+          entry = self.index_file(child)
+          index_entries << entry if entry
         end
 
         # now import directories
         dirs.each do |dir|
-          import_directory(dir)
+          index_entries = index_entries | index_directory(dir)
         end
+
+        index_entries
       end
 
       # remove a path from the index
       def remove(full_path)
         full_path = Pathname.new(full_path).realpath.to_s
-        if not in_root? full_path
+        unless in_root? full_path
           path_not_under_error full_path
         end
 
         # find which type of model this is
         rp = relative_path(full_path)
-        klass = @sections.to_a.select{|s| s.should_contain? rp }.first
 
-        repr = klass.first(:relative_path => rp)
-
+        repr = Media.first(:relative_path => rp)
         repr.delete!
       end
     end

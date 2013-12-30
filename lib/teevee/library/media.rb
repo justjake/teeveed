@@ -14,9 +14,6 @@ module Teevee
       # you should use #{SUFIX} in your REGEX to denote the end.
       SUFFIX = '__SUFFIX__'.freeze
 
-      # The {Library} that contains this Section
-      class_attribute :library
-
       # Regex with named sections to select the data for each field
       # from the truncated path of a given record
       class_attribute :regex
@@ -29,6 +26,12 @@ module Teevee
       # filetype. Run after prefix filtering
       class_attribute :suffix
 
+      # Convert a MatchData object to a plain ruby hash
+      # for use with named captures in a regex
+      def self.match_to_hash(match)
+        Hash[ match.names.zip( match.captures ) ]
+      end
+
       def self.should_contain?(relative_path)
         (self.suffix =~ relative_path) and (self.prefix =~ relative_path)
       end
@@ -39,11 +42,11 @@ module Teevee
       end
 
       # import the file at `relative_path` under self.root as a new Media of this type
-      def self.import_relative(rp)
+      def self.index_path(rp)
         stripped = stripped_path(rp)
 
         # TODO handle a no-match case
-        data = self.regex.match(stripped).to_hash
+        data = match_to_hash self.regex.match(stripped)
         data[:relative_path] = rp
         self.new(data)
       end
@@ -67,6 +70,8 @@ module Teevee
       # like /Movies/Zoolander (2001).avi
       property :title,          String
       property :year,           Integer
+      self.prefix = %r{^/Movies/}
+      self.suffix = %r{\.(mkv|m4v|mov|avi|flv|mpg|wmv)$}
       self.regex = %r{
         (?<title> .*?)       # title is lots of character
         \s\(                 # exclude a space and open year
@@ -76,7 +81,7 @@ module Teevee
     end
 
     # a single song
-    class Song < Media
+    class Music < Media
       # like /Music/Röyksopp/Junior/[10] Röyksopp - True to Life.mp3
       property :title,          String
       property :artist,         String
@@ -86,7 +91,7 @@ module Teevee
     end
 
     # an episode of a TV show or anime
-    class Episode < Media
+    class Television < Media
       # like /Television/Game of Thrones/Season 02/Game of Thrones - S02E03 - What is Dead May Never Die.mp4
       property :show,           String
       property :season,         Integer
@@ -94,5 +99,9 @@ module Teevee
       property :grouping,       String # for episodes without seasons
       property :title,          String # for named episodes (most)
     end
+
+
+    Sections = [Movie, Music, Television]
+
   end
 end
