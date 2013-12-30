@@ -20,5 +20,6 @@ gem 'activesupport'
 gem 'listen', '~> 2.0'
 
 group :development do
-  gem 'pry' # the best
+  gem 'pry' # interactive console
+  gem 'warbler' # jar builder for deployment
 end
