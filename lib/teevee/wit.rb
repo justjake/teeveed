@@ -32,8 +32,6 @@ module Teevee
     def message(query)
       resp = self.get('/message', :q => query)
       JSON.parse(resp.body)
-    rescue JSON::ParserError
-      return nil
     end
   end
 end
