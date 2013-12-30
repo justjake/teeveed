@@ -93,7 +93,7 @@ module Teeveed
     attr_accessor :store
 
     def initialize
-      @wit = Wit.new
+      @wit = Wit.new(WIT_ACCESS_TOKEN)
       @root = Library::Root.new(TEEVEED_HOME + 'library', Library::Sections)
     end
 

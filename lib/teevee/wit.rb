@@ -20,9 +20,11 @@ module Teevee
       attr_accessor :type   # string
     end
 
-    def initialize
+    # Create a new Wit api with the given Oauth access token, as seen
+    # at https://console.wit.ai/#/settings
+    def initialize(token)
       super('https://api.wit.ai', :headers => {
-          'Authorization' => "Bearer #{WIT_ACCESS_TOKEN}"
+          'Authorization' => "Bearer #{token}"
       })
     end
 
