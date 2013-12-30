@@ -20,6 +20,6 @@ gem 'activesupport'
 gem 'listen', '~> 2.0'
 
 group :development do
-  gem 'pry' # interactive console
+  gem 'pry-remote' # interactive console
   gem 'warbler' # jar builder for deployment
 end
