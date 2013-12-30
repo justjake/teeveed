@@ -13,7 +13,7 @@ TODO: tests or something
 
 ## Goals
 
-### Library
+### Index
 
 - Keep a fast index of all the media on a share for quick search
 - index needs to respond to natural-language searches
