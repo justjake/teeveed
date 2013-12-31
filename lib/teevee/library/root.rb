@@ -54,7 +54,7 @@ module Teevee
         path_not_under_error full_path
       end
 
-      # import a file into the library. basic algorithm:
+      # index a file into the library. basic algorithm:
       #   1. is this path within the Root?
       #   2. for each @sections:
       #     - does this path go in this section?
@@ -62,7 +62,7 @@ module Teevee
       #     - is this path already in the database?
       #     - cool, import using section.new section.regex.match(relative_path)
       # TODO: log all import operations
-      def index_file(full_path)
+      def index_path(full_path)
         # only files that exist
         fp = Pathname.new(full_path).realpath
 
@@ -76,9 +76,9 @@ module Teevee
 
         rp = fp.to_s[path.length..-1]
 
-        @sections.each do |s|
-          if s.prefix =~ rp and s.suffix =~ rp
-            return s.index_path(rp)
+        @sections.each do |media_type|
+          if media_type.should_contain? rp
+            return media_type.index_path rp
           end
         end
 
@@ -86,51 +86,14 @@ module Teevee
         false
       end
 
-      # import all the files first before recursing into directories
-      # breadth-first
-      def index_directory(full_path)
-        fp = Pathname.new(full_path).realpath
-
-        # only directories
-        return false unless fp.directory?
-
-        # only directories in the root
-        unless in_root? fp
-          path_not_under_error fp
-        end
-
-        # breadth-first
-        index_entries = []
-        dirs = []
-
-        fp.each_child do |child|
-          if child.directory?
-            dirs << child
-            next
-          end
-
-          entry = self.index_file(child)
-          index_entries << entry if entry
-        end
-
-        # now import directories
-        dirs.each do |dir|
-          index_entries = index_entries | index_directory(dir)
-        end
-
-        index_entries
-      end
-
       # remove a path from the index
-      def remove(full_path)
+      def remove_path(full_path)
         full_path = Pathname.new(full_path).realpath.to_s
         unless in_root? full_path
           path_not_under_error full_path
         end
 
-        # find which type of model this is
         rp = relative_path(full_path)
-
         repr = Media.first(:relative_path => rp)
         repr.delete!
       end
