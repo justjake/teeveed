@@ -41,7 +41,8 @@ module Teevee
         stripped.gsub(self.suffix, SUFFIX)
       end
 
-      # import the file at `relative_path` under self.root as a new Media of this type
+      # import the file at `relative_path` under self.root as a new Media of
+      # this type
       def self.index_path(rp)
         stripped = stripped_path(rp)
 
@@ -102,8 +103,6 @@ module Teevee
       self.prefix = %r{^/Television/}
       self.suffix = Movie.suffix
       self.regex = %r{
-      (?:<name_sep>\s-\s){0}           # pre-define name seperator
-
       (?<show> [^/+]) /                # Show/
       (?:(?:                           # Season XX/ or <anything>/ , optional
         (?:Season\s(?<season> \d+)) |     # Season XX
@@ -112,10 +111,10 @@ module Teevee
       (?:                               # <Show> - SXXEXX - <Title>, or, <anything>
         (?:                               # well-formatted name
           \k<show>                          # show name repeated
-          \g<name_sep>                      # -
+          \s-\s                             # -
           S\d+                              # SXX
           E(?<episode_num>\d+)              # EXX
-          \g<name_sep>                      # -
+          \s-\s                             # -
           (?:<title>.+?)                    # <title>
         ) |                               # OR
         (?:<title>.+?)                    # anything
