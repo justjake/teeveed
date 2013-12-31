@@ -81,6 +81,7 @@ module Teevee
     end
 
     # a single song
+    # we might not use this thing, because songs are haaaard to index
     class Music < Media
       # like /Music/Röyksopp/Junior/[10] Röyksopp - True to Life.mp3
       property :title,          String
@@ -98,6 +99,29 @@ module Teevee
       property :episode_num,    Integer
       property :grouping,       String # for episodes without seasons
       property :title,          String # for named episodes (most)
+      self.prefix = %r{^/Television/}
+      self.suffix = Movie.suffix
+      self.regex = %r{
+      (?:<name_sep>\s-\s){0}           # pre-define name seperator
+
+      (?<show> [^/+]) /                # Show/
+      (?:(?:                              # Season XX/ or <anything>/ , optional
+        (?:Season\s(?<season> \d+)) |       # Season XX
+        (?<grouping> [^/+])                 # <anything>
+      )/)?
+      (?:                               # <Show> - SXXEXX - <Title>, or, <anything>
+        (?:                               # well-formatted name
+          \k<show>                          # show name repeated
+          \g<name_sep>                      # -
+          S\d+                              # SXX
+          E(?<episode_num>\d+)              # EXX
+          \g<name_sep>                      # -
+          (?:<title>.+?)                    # <title>
+        ) |                               # OR
+        (?:<title>.+?)                    # anything
+      )
+      #{SUFFIX}$                        # suffix
+      }x
     end
 
 
