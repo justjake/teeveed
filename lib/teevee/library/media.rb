@@ -105,9 +105,9 @@ module Teevee
       (?:<name_sep>\s-\s){0}           # pre-define name seperator
 
       (?<show> [^/+]) /                # Show/
-      (?:(?:                              # Season XX/ or <anything>/ , optional
-        (?:Season\s(?<season> \d+)) |       # Season XX
-        (?<grouping> [^/+])                 # <anything>
+      (?:(?:                           # Season XX/ or <anything>/ , optional
+        (?:Season\s(?<season> \d+)) |     # Season XX
+        (?<grouping> [^/+])               # <anything>
       )/)?
       (?:                               # <Show> - SXXEXX - <Title>, or, <anything>
         (?:                               # well-formatted name
