@@ -14,3 +14,4 @@ end
 
 require 'teevee/library/root'
 require 'teevee/library/media'
+require 'teevee/library/indexer'

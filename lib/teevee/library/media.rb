@@ -18,10 +18,6 @@ module Teevee
       # from the truncated path of a given record
       class_attribute :regex
 
-      # Prefix regexp (starts with ^) to detect that this library section
-      # should be used
-      class_attribute :prefix
-
       # Suffix regext (ends with $) to detect the correct extensions for this
       # filetype. Run after prefix filtering
       class_attribute :suffix
@@ -36,15 +32,15 @@ module Teevee
         (self.suffix =~ relative_path) and (self.prefix =~ relative_path)
       end
 
-      def self.stripped_path(relative_path)
-        stripped = relative_path.gsub(self.prefix, '')
+      def self.stripped_path(relative_path, prefix)
+        stripped = relative_path.gsub(%r{^#{prefix}/}, '')
         stripped.gsub(self.suffix, SUFFIX)
       end
 
       # import the file at `relative_path` under self.root as a new Media of
       # this type
-      def self.index_path(rp)
-        stripped = stripped_path(rp)
+      def self.index_path(rp, prefix)
+        stripped = stripped_path(rp, prefix)
 
         # TODO handle a no-match case
         data = match_to_hash self.regex.match(stripped)
@@ -53,7 +49,6 @@ module Teevee
       end
 
       ### default matchers
-      self.prefix = /^/
       self.suffix = /\.\w{3,}$/
       self.regex  = //
 
@@ -71,7 +66,6 @@ module Teevee
       # like /Movies/Zoolander (2001).avi
       property :title,          String
       property :year,           Integer
-      self.prefix = %r{^/Movies/}
       self.suffix = %r{\.(mkv|m4v|mov|avi|flv|mpg|wmv)$}
       self.regex = %r{
         (?<title> .*?)       # title is lots of character
@@ -83,7 +77,7 @@ module Teevee
 
     # a single song
     # we might not use this thing, because songs are haaaard to index
-    class Music < Media
+    class Track < Media
       # like /Music/Röyksopp/Junior/[10] Röyksopp - True to Life.mp3
       property :title,          String
       property :artist,         String
@@ -93,14 +87,13 @@ module Teevee
     end
 
     # an episode of a TV show or anime
-    class Television < Media
+    class Episode < Media
       # like /Television/Game of Thrones/Season 02/Game of Thrones - S02E03 - What is Dead May Never Die.mp4
       property :show,           String
       property :season,         Integer
       property :episode_num,    Integer
       property :grouping,       String # for episodes without seasons
       property :title,          String # for named episodes (most)
-      self.prefix = %r{^/Television/}
       self.suffix = Movie.suffix
       self.regex = %r{
       (?<show> [^/+]) /                # Show/
@@ -124,7 +117,11 @@ module Teevee
     end
 
 
-    Sections = [Movie, Music, Television]
+    Sections = {
+        "Movies" => Movie,
+        "Music" => Track,
+        "Television" => Episode
+    }
 
   end
 end

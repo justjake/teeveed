@@ -13,29 +13,32 @@ module Teevee
     # and all agree that everything is in the same place
     class Root
 
+      # sections is a Hash mapping from a relative path to a subclass of Media
+      # intended to index the files in that path.
+      # For instance, if you stored music videos in "/mnt/storage/Music Videos"
+      # and your library root was "/mnt/storage", then your map should contain
+      # "Music Videos" => Library::MusicVideo
+      attr_reader :sections
+
       # root path
-      attr_reader :path
+      attr_reader :pathname
 
-      def initialize(path, sections = [])
-        @path = Pathname.new(path).realpath.to_s.freeze
-        @closed = false
-        @sections = Set.new(sections)
+      # root path as a Pathname
+      def path
+        self.pathname.to_s
       end
 
-      def finalize!
-        @closed = true
-        @sections.freeze
-      end
-
-      # initialize and add a new library section
-      def section(media_subclass)
-        @sections.add media_subclass
+      def initialize(path, sections = {})
+        @pathname = Pathname.new(path).realpath.freeze
+        @sections = sections
       end
 
       # True if the given path is in this root
       def in_root?(path)
-        fp = Pathname.new(path).realpath.to_s
-        fp.start_with? path
+        fp = Pathname.new(path).realpath
+        return true if fp.relative_path_from(self.pathname)
+      rescue ArgumentError
+        return false
       end
 
       # TODO replace with an exception type
@@ -44,14 +47,10 @@ module Teevee
       end
 
       # Returns path as relative to this root
+      # @return String
       def relative_path(full_path)
-        full_path = Pathname.new(full_path).realpath.to_s
-        if in_root? full_path
-          # sliced to size of relative path
-          return full_path[path.length..-1]
-        end
-
-        path_not_under_error full_path
+        full_path = Pathname.new(full_path).realpath
+        full_path.relative_path_from(self.pathname).to_s
       end
 
       # index a file into the library. basic algorithm:
@@ -67,23 +66,31 @@ module Teevee
         fp = Pathname.new(full_path).realpath
 
         # only files
-        return false unless fp.file?
+        unless fp.file?
+          raise TypeError, "The object at path #{fp} is not a file."
+        end
 
         # fp must be in root
         unless in_root? fp
           path_not_under_error fp
         end
 
-        rp = fp.to_s[path.length..-1]
+        rp = fp.relative_path_from(self.pathname).to_s
+        prefix = @sections.keys.find {|prefix| rp.start_with? (prefix + '/') }
 
-        @sections.each do |media_type|
-          if media_type.should_contain? rp
-            return media_type.index_path rp
-          end
+        @sections[prefix].index_path(rp, prefix)
+      end
+
+      # indexes all files in path, recursivley
+      # @param start [String, Pathname] start of directory traversal
+      def index_recusive(start)
+        start = Pathname.new(path).realpath
+        start.relative_path_from(pathname)
+
+        start.find do |path|
+          next unless path.file?
+          self.index_path(path)
         end
-
-        # abject failure
-        false
       end
 
       # remove a path from the index
