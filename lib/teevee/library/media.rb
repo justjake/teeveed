@@ -66,7 +66,7 @@ module Teevee
       # like /Movies/Zoolander (2001).avi
       property :title,          String
       property :year,           Integer
-      self.suffix = %r{\.(mkv|m4v|mov|avi|flv|mpg|wmv)$}
+      self.suffix = %r{\.(mkv|m4v|mov|avi|flv|mpg|wmv|mp4)$}
       self.regex = %r{
         (?<title> .*?)       # title is lots of character
         \s\(                 # exclude a space and open year
@@ -96,23 +96,27 @@ module Teevee
       property :title,          String # for named episodes (most)
       self.suffix = Movie.suffix
       self.regex = %r{
-      (?<show> [^/+]) /                # Show/
-      (?:(?:                           # Season XX/ or <anything>/ , optional
-        (?:Season\s(?<season> \d+)) |     # Season XX
-        (?<grouping> [^/+])               # <anything>
-      )/)?
-      (?:                               # <Show> - SXXEXX - <Title>, or, <anything>
-        (?:                               # well-formatted name
-          \k<show>                          # show name repeated
-          \s-\s                             # -
-          S\d+                              # SXX
-          E(?<episode_num>\d+)              # EXX
-          \s-\s                             # -
-          (?:<title>.+?)                    # <title>
-        ) |                               # OR
-        (?:<title>.+?)                    # anything
+      ^
+      (?<show> [^/]+)/            # <Show>/
+      (?:                        # Season or Grouping?
+        Season\s(?<season>\d+)   # Season <XX>
+        |
+        (?<grouping>[^/]+)       # <grouping>
+      )/
+      (?:                        # Episode info or Crazy?
+        (?:                      # regular episode format
+          .+?                    # show again
+          \s-\s                  # -
+          S\d+                   # SXX
+          E(?<episode_num>\d+)   # E<XX>
+          \s-\s                  # -
+          (?<title>.+?)          # <title>
+        )
+        |   # OR
+        (?<title> [^/]+)# just a title
       )
-      #{SUFFIX}$                        # suffix
+      #{SUFFIX}                   # SUFFIX
+      $
       }x
     end
 
