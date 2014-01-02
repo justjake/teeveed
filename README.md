@@ -27,11 +27,12 @@ TODO: tests or something
 rudamentry element information from pathnames
 
 On indexer startup, the index database is rebuilt from scratch, to eliminate
-stale indexes. This is fine to do, as `time find /mnt/storage/{Movies,Television,Books} > /dev/null`
-shows that crawling these directories won't be too slow.
+stale indexes. This is fine to do, as
+`time find /mnt/storage/{Movies,Television,Books} > /dev/null` shows that
+crawling these directories won't be too slow.
 
-In addition to rebuilding the index on application boot, all index queries will have
-the following protection run on them (idealized implementation)
+In addition to rebuilding the index on application boot, all index queries will
+have the following protection run on them (idealized implementation)
 
 ```ruby
 # Array<Media> returned in ranked order from best to worst match
