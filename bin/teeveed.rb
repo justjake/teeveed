@@ -42,7 +42,9 @@ imported.each do |repr|
   puts "Imported #{repr.relative_path}:\n\t#{repr.inspect}"
 end
 
+
 if ARGV[0] == 'cli'
+  api = Teevee::Wit.new(WIT_ACCESS_TOKEN)
   binding.pry
 end
 
