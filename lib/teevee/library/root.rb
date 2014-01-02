@@ -34,6 +34,8 @@ module Teevee
       end
 
       # True if the given path is in this root
+      # TODO: this is broken and does not enforce the constraint
+      #   FIXIT
       def in_root?(path)
         fp = Pathname.new(path).realpath
         return true if fp.relative_path_from(self.pathname)
@@ -84,13 +86,17 @@ module Teevee
       # indexes all files in path, recursivley
       # @param start [String, Pathname] start of directory traversal
       def index_recusive(start)
-        start = Pathname.new(path).realpath
-        start.relative_path_from(pathname)
+        # check start is a good path.
+        start = Pathname.new(start).realpath
+        path_not_under_error(start.to_s) unless in_root? start
 
+        indexed = []
         start.find do |path|
           next unless path.file?
-          self.index_path(path)
+          repr = self.index_path(path)
+          indexed << repr if repr
         end
+        indexed
       end
 
       # remove a path from the index
