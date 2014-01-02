@@ -48,6 +48,7 @@ module Teevee
         match = self.regex.match(stripped)
         if match
           data = match_to_hash(match)
+          # TODO handle non-unique relative paths somehow
           data[:relative_path] = rp
           return self.new(data)
         end
