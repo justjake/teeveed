@@ -44,7 +44,7 @@ end
 
 
 if ARGV[0] == 'cli'
-  api = Teevee::Wit.new(WIT_ACCESS_TOKEN)
+  api = Teevee::Wit::API.new(WIT_ACCESS_TOKEN)
   binding.pry
 end
 

@@ -4,9 +4,8 @@ require 'json'
 module Teevee
   # Provides an API connection to Wit.ai
   # Wit performs all our natural language processing tasks
-  class Wit < Faraday::Connection
 
-
+  module Wit
     # A Wit entity.
     # TODO: is this needed?
     class Entity
@@ -45,6 +44,7 @@ module Teevee
       end
     end
 
+    # A response to an API query
     class Query
       attr_reader :body
       attr_reader :outcome
@@ -55,29 +55,32 @@ module Teevee
       end
     end
 
-    # Create a new Wit api with the given Oauth access token, as seen
-    # at https://console.wit.ai/#/settings
-    def initialize(token)
-      super('https://api.wit.ai', :headers => {
-          'Authorization' => "Bearer #{token}"
-      })
+    class API < Faraday::Connection
+      # Create a new Wit api with the given Oauth access token, as seen
+      # at https://console.wit.ai/#/settings
+      def initialize(token)
+        super('https://api.wit.ai', :headers => {
+            'Authorization' => "Bearer #{token}"
+        })
+      end
+
+      def message(query)
+        resp = self.get('/message', :q => query)
+        resp.body
+      end
+
+      # Send user input data to Wit.ai to recieve a parsed intent
+      # should be using Faraday middleware but its inexplicably broken
+      # and i'm tired of fighting this problem here
+      def message_hash(query)
+        JSON.parse(message(query))
+      end
+
+      # Fully wrapped and hopefully fixture-safe for future subclassing
+      def query(query)
+        Query.new(message_hash(query))
+      end
     end
 
-    def message(query)
-      resp = self.get('/message', :q => query)
-      resp.body
-    end
-
-    # Send user input data to Wit.ai to recieve a parsed intent
-    # should be using Faraday middleware but its inexplicably broken
-    # and i'm tired of fighting this problem here
-    def message_json(query)
-      JSON.parse(message(query))
-    end
-
-    # Fully wrapped and hopefully fixture-safe for future subclassing
-    def query(query)
-      Query.new(message_json(query))
-    end
   end
 end
