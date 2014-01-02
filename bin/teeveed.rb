@@ -31,32 +31,15 @@ DataMapper.setup(:default, 'sqlite::memory:')
 DataMapper.finalize
 DataMapper.auto_migrate!
 
-TEST_PATHS = [
-    'Television/Game of Thrones/Season 02/Game of Thrones - S02E03 - What is Dead May Never Die.mp4',
-    'Movies/Zoolander (2001).avi'
-]
-
 ### some siple tests
 root = Teevee::Library::Root.new (TEEVEED_HOME+'library').to_s, {
     'Television' => Teevee::Library::Episode,
     'Movies' => Teevee::Library::Movie
 }
-cli = Teevee::Daemon::CLI.new
-
-TEST_PATHS.each do |path|
-  path = cli.root.pathname + path
-  begin
-    row = root.index_path(path)
-    if row
-      puts "SUCCESS: indexed #{path} as \n#{row.inspect}"
-      cli.store = row
-    else
-      puts "FAILURE: couldn't index #{path}"
-    end
-  rescue => err
-    puts "FAILURE: exeption #{err}"
-    puts err.backtrace
-  end
+## test importing of the whole shebang
+imported = root.index_recusive(root.path)
+imported.each do |repr|
+  puts "Imported #{repr.relative_path}:\n\t#{repr.inspect}"
 end
 
 if ARGV[0] == 'cli'
