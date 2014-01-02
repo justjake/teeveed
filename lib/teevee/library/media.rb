@@ -25,7 +25,9 @@ module Teevee
       # Convert a MatchData object to a plain ruby hash
       # for use with named captures in a regex
       def self.match_to_hash(match)
-        Hash[ match.names.zip( match.captures ) ]
+        res = {}
+        match.names.each {|name| res[name] = match[name]}
+        res
       end
 
       def self.should_contain?(relative_path)
@@ -43,9 +45,13 @@ module Teevee
         stripped = stripped_path(rp, prefix)
 
         # TODO handle a no-match case
-        data = match_to_hash self.regex.match(stripped)
-        data[:relative_path] = rp
-        self.new(data)
+        match = self.regex.match(stripped)
+        if match
+          data = match_to_hash(match)
+          data[:relative_path] = rp
+          return self.new(data)
+        end
+        return nil
       end
 
       ### default matchers
@@ -68,10 +74,17 @@ module Teevee
       property :year,           Integer
       self.suffix = %r{\.(mkv|m4v|mov|avi|flv|mpg|wmv|mp4)$}
       self.regex = %r{
-        (?<title> .*?)       # title is lots of character
-        \s\(                 # exclude a space and open year
-        (?<year> \d+)        # match year
-        \)#{SUFFIX}$         # close parens then suffix
+        (?:                  # <title> (<year>) or <title>
+          (?:
+            (?<title> [^/]+)     # title is lots of character
+            \s\(                 # (
+            (?<year> \d+)        # <year>
+            \)                   # )
+          )
+          |                    # OR
+          (?<title> [^/]+)
+        )
+        #{SUFFIX}$         # close parens then suffix
       }x
     end
 
@@ -96,27 +109,31 @@ module Teevee
       property :title,          String # for named episodes (most)
       self.suffix = Movie.suffix
       self.regex = %r{
-      ^
+      ^                           # BEGIN
       (?<show> [^/]+)/            # <Show>/
-      (?:                        # Season or Grouping?
-        Season\s(?<season>\d+)   # Season <XX>
+      (?:                         # Season or Grouping?
+        Season\s(?<season>\d+)      # Season <XX>
         |
-        (?<grouping>[^/]+)       # <grouping>
+        (?<grouping>[^/]+)          # <grouping>
       )/
-      (?:                        # Episode info or Crazy?
-        (?:                      # regular episode format
-          .+?                    # show again
-          \s-\s                  # -
-          S\d+                   # SXX
-          E(?<episode_num>\d+)   # E<XX>
-          \s-\s                  # -
-          (?<title>.+?)          # <title>
+      (?:                         # Episode info or garbage
+        (?:                         # regular episode format: <Series> - SXXE<XX> - <title>.m4v
+          [^/]+?                      # show again
+          \s-\s                       # -
+          (?:                         # SXXE<XX> or garbage
+            S\d+                        # SXX
+            E(?<episode_num>\d+)        # E<XX>
+            |                           # OR
+            [^/]+?                      # some garbage
+          )
+          \s-\s                       # -
+          (?<title>.+?)               # <title>
         )
-        |   # OR
-        (?<title> [^/]+)# just a title
+        |                           # OR
+        (?<title> [^/]+)            # just a title
       )
-      #{SUFFIX}                   # SUFFIX
-      $
+      #{SUFFIX}                   # suffix
+      $                           # END
       }x
     end
 
