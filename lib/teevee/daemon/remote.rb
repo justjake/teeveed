@@ -1,6 +1,5 @@
 require 'sinatra/base'
 require 'haml'
-require 'JSON'
 
 module Teevee
   module Daemon
@@ -39,7 +38,7 @@ module Teevee
       %h2 Intent
       %pre
         %code
-          = @intent_json
+          = @intent_codez
       - if @intent_res
         %h2 Result
         = @intent_res
@@ -63,7 +62,7 @@ module Teevee
         controller = Teevee::Daemon::IntentController.new
 
         @query = wit.query(params[:q])
-        @intent_json = h @query.pretty_inspect
+        @intent_codez = h @query.pretty_inspect
         @intent_res = nil
         if @query.outcome.is_a? Wit::Intent
           begin
