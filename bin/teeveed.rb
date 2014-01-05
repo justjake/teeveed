@@ -3,18 +3,24 @@
 # https://github.com/justjake/teeveed
 # GNU GPLv3
 
-# try to run in cmd.exe
-if ARGV[0] == 'launch'
-  `start "Teeveed Console" /max cmd.exe /k jruby '#{__FILE__}' cli`
-  puts "finished CLI session"
-  exit 0
+# first do options things
+require 'trollop'
+opts = Trollop::options do
+  opt :indexer, "Launch indexer. currently unimplemented"
+  opt :cli, "boot into a local pry session"
+  opt :remote, "Launch remote pry debug server", default: true
+  opt :wit_token, "wit oauth2 access token.", :type => :string
+
+  opt :web, "Launch webserver", default: true
+  opt :ip, "listening ip for the web ui", :default => '0.0.0.0'
+  opt :port, "listening port for the web ui", :default => '1337'
 end
 
 # config
-WIT_ACCESS_TOKEN = ENV['WIT_ACCESS_TOKEN']
+WIT_ACCESS_TOKEN = opts[:wit_token] || ENV['WIT_ACCESS_TOKEN']
 TEEVEED_HOME = Pathname.new(__FILE__).parent.parent.realpath + 'arena'
-REMOTE_IP = '0.0.0.0'
-REMOTE_PORT = 1337
+REMOTE_IP = opts[:ip]
+REMOTE_PORT = opts[:port]
 
 require 'rubygems'
 require 'bundler'
@@ -43,25 +49,32 @@ imported.each do |repr|
 end
 
 
-if ARGV[0] == 'cli'
+if opts[:cli]
   api = Teevee::Wit::API.new(WIT_ACCESS_TOKEN)
   binding.pry
+  exit 0
 end
 
 ### daemonize if env is right
-if ENV['TEEVEED_DAEMONIZE'] == 'YES'
+threads = []
+
+if opts[:web]
   # start the webserver for the remote in a thread
   web = Thread.new do
     Teevee::Daemon::Remote.run!
   end
+  threads << web
+end
 
+if opts[:remote]
   # start pry-remote in a thread
   debug = Thread.new do
     while true do
       cli.interact!
     end
   end
-
-  # wait for our server (forever)
-  [web, debug].each {|t| t.join}
+  threads << debug
 end
+
+# wait for our server (forever)
+threads.each {|t| t.join}
