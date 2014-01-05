@@ -21,5 +21,5 @@ gem 'listen', '~> 2.0'
 
 group :development do
   gem 'pry-remote' # interactive console
-  gem 'warbler' # jar builder for deployment
+  # gem 'warbler' # jar builder for deployment
 end
