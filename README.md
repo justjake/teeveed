@@ -9,6 +9,10 @@ winter break project 12/28/13 - 1/10/14 by @jitl
 everything in jruby in 2.0.0 mode. usual setup with Bundler.
 at some point PostgreSQL will be required.
 
+You should get [drip](https://github.com/flatland/drip) in your ~/bin,
+and then `source drip.env.sh` before launching any of this ruby junk.
+Drip'll put the spring back in your step!
+
 TODO: tests or something
 
 ## Goals
