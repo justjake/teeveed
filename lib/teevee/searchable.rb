@@ -3,6 +3,7 @@ module Teevee
   # mixin. include to add Postgres full-text search support to a
   # DataMapper resource
   # from https://gist.github.com/BrianTheCoder/217158
+  # TODO add postgres trigram support, see http://bartlettpublishing.com/site/bartpub/blog/3/entry/350
   module Searchable
     # run when `include Database::Searchable`
     def self.included(by_class)
@@ -17,7 +18,7 @@ module Teevee
 
       # all classes that inherit from this class, directly or indirectly
       def descendants
-        ObjectSpace.each_object(Class).select {|k| k < self}
+        ObjectSpace.each_object(Class).select{|k| k < self}
       end
 
       # crawl up the parent tree and get all the unique
@@ -40,13 +41,13 @@ module Teevee
       # perform a full text search
       # @param [String] query     the search terms
       # @param [Hash] options
-      # @param
+      # @param [Array<Symbol>] options[:search_indexes] which fields to search
       def search(query, options = {})
         given_search_indexes = options[:search_indexes] || all_search_indexes
         conds = given_search_indexes.map do |index|
-          "#{idx}_search_index @@ plainto_tsquery(?)"
+          "#{index}_search_index @@ plainto_tsquery(?)"
         end
-        conds_array = [conds.join(" OR ")]
+        conds_array = [conds.join(' OR ')]
         given_search_indexes.size.times { conds_array << escape_string(query) }
         all(options.merge(:conditions => conds_array))
       end

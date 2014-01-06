@@ -11,7 +11,7 @@ gem 'haml'
 # database stuff - no Rails for me kthx
 gem 'jdbc-sqlite3'
 gem 'data_mapper'
-gem 'dm-sqlite-adapter'
+gem 'dm-postgres-adapter'
 
 # used for class_attribute
 gem 'activesupport'

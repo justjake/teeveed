@@ -38,15 +38,15 @@ GEM
       dm-core (~> 1.2.0)
     dm-migrations (1.2.0)
       dm-core (~> 1.2.0)
+    dm-postgres-adapter (1.2.0)
+      dm-do-adapter (~> 1.2.0)
+      do_postgres (~> 0.10.6)
     dm-serializer (1.2.2)
       dm-core (~> 1.2.0)
       fastercsv (~> 1.5)
       json (~> 1.6)
       json_pure (~> 1.6)
       multi_json (~> 1.0)
-    dm-sqlite-adapter (1.2.0)
-      dm-do-adapter (~> 1.2.0)
-      do_sqlite3 (~> 0.10.6)
     dm-timestamps (1.2.0)
       dm-core (~> 1.2.0)
     dm-transactions (1.2.0)
@@ -63,12 +63,10 @@ GEM
       dm-core (~> 1.2.0)
     do_jdbc (0.10.13-java)
       data_objects (= 0.10.13)
-    do_sqlite3 (0.10.13)
-      data_objects (= 0.10.13)
-    do_sqlite3 (0.10.13-java)
+    do_postgres (0.10.13-java)
       data_objects (= 0.10.13)
       do_jdbc (= 0.10.13)
-      jdbc-sqlite3 (>= 3.5.8)
+      jdbc-postgres (>= 8.2)
     faraday (0.8.8)
       multipart-post (~> 1.2.0)
     faraday_middleware (0.8.8)
@@ -79,9 +77,8 @@ GEM
     haml (4.0.4)
       tilt
     i18n (0.6.9)
+    jdbc-postgres (9.3.1100)
     jdbc-sqlite3 (3.7.2.1)
-    jruby-jars (1.7.9)
-    jruby-rack (1.1.13.3)
     json (1.8.1)
     json (1.8.1-java)
     json_pure (1.8.1)
@@ -93,6 +90,10 @@ GEM
     minitest (4.7.5)
     multi_json (1.8.2)
     multipart-post (1.2.0)
+    pry (0.9.12.4)
+      coderay (~> 1.0)
+      method_source (~> 0.8)
+      slop (~> 3.4)
     pry (0.9.12.4-java)
       coderay (~> 1.0)
       method_source (~> 0.8)
@@ -104,11 +105,9 @@ GEM
     rack (1.5.2)
     rack-protection (1.5.1)
       rack
-    rake (10.1.1)
     rb-fsevent (0.9.3)
     rb-inotify (0.9.3)
       ffi (>= 0.5.0)
-    rubyzip (1.0.0)
     sinatra (1.4.4)
       rack (~> 1.4)
       rack-protection (~> 1.4)
@@ -125,11 +124,6 @@ GEM
     timers (1.1.0)
     tzinfo (0.3.38)
     uuidtools (2.1.4)
-    warbler (1.4.0)
-      jruby-jars (>= 1.5.6)
-      jruby-rack (>= 1.0.0)
-      rake (>= 0.9.6)
-      rubyzip (>= 0.9, < 1.1)
 
 PLATFORMS
   java
@@ -137,7 +131,7 @@ PLATFORMS
 DEPENDENCIES
   activesupport
   data_mapper
-  dm-sqlite-adapter
+  dm-postgres-adapter
   faraday (~> 0.8.0)
   faraday_middleware (~> 0.8.0)
   haml
@@ -145,4 +139,3 @@ DEPENDENCIES
   listen (~> 2.0)
   pry-remote
   sinatra
-  warbler

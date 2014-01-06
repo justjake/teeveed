@@ -1,6 +1,8 @@
 require 'data_mapper'
 require 'active_support/core_ext/class/attribute'
 
+require 'teevee/searchable'
+
 module Teevee
   module Library
 
@@ -9,6 +11,26 @@ module Teevee
     # full-text search. A fuzzy-matching search was considered but discarded
     # because voice input is unlikely to have substring matches
     class Media
+
+      ### DataMapper Properties ###############################################
+      include DataMapper::Resource
+      property :id,             Serial
+
+      # path of the media resource from the library root
+      property :relative_path,  String, :unique_index => true,
+                                        :required => true,
+                                        :length => (1..255)
+
+      # used for pruning old things from the index:
+      # 1. started = Time.now
+      # 2. scan each file, updating its :last_seen to Time.now
+      # 3. DELETE FROM media WHERE last_seen < started
+      property :last_seen,      DateTime, :default => proc {DateTime.now}
+
+
+      ### Full Text Search ####################################################
+      include Teevee::Searchable
+      self.search_indexes =  [:relative_path]
 
       # suffixes are replaced by this value before the regex is run
       # you should use #{SUFIX} in your REGEX to denote the end.
@@ -21,6 +43,7 @@ module Teevee
       # Suffix regext (ends with $) to detect the correct extensions for this
       # filetype. Run after prefix filtering
       class_attribute :suffix
+
 
       # Convert a MatchData object to a plain ruby hash
       # for use with named captures in a regex
@@ -58,14 +81,6 @@ module Teevee
       ### default matchers
       self.suffix = /\.\w{3,}$/
       self.regex  = //
-
-      ### DataMapper Properties
-      include DataMapper::Resource
-      property :id,             Serial
-
-      # path of the media resource from the library root
-      property :relative_path,  String, :unique => true,
-                                        :required => true
     end
 
     # A movie file in the library
@@ -73,6 +88,7 @@ module Teevee
       # like /Movies/Zoolander (2001).avi
       property :title,          String
       property :year,           Integer
+      self.search_indexes = [:title]
       self.suffix = %r{\.(mkv|m4v|mov|avi|flv|mpg|wmv|mp4)$}
       self.regex = %r{
         (?:                  # <title> (<year>) or <title>
@@ -98,6 +114,7 @@ module Teevee
       property :album,          String
       property :track_num,      Integer
       property :grouping,       String  # for non-album tracks
+      self.search_indexes = [:title, :artist, :album, :grouping]
     end
 
     # an episode of a TV show or anime
@@ -108,6 +125,7 @@ module Teevee
       property :episode_num,    Integer
       property :grouping,       String # for episodes without seasons
       property :title,          String # for named episodes (most)
+      self.search_indexes = [:show, :grouping, :title]
       self.suffix = Movie.suffix
       self.regex = %r{
       ^                           # BEGIN
