@@ -77,12 +77,16 @@ root = Teevee::Library::Root.new (TEEVEED_HOME+'library').to_s, {
     'Television' => Teevee::Library::Episode,
     'Movies' => Teevee::Library::Movie
 }
-# # test importing of the whole shebang
-# imported = root.index_recusive(root.path)
-# imported.each do |repr|
-#   puts "Imported #{repr.relative_path}:\n\t#{repr.inspect}"
-# end
 
+# central storage
+app = Teevee::Daemon.instance = Teevee::Daemon::Application.new(
+    root,
+    Teevee::Library::Indexer.new(root),
+    DataMapper::Logger.new(STDOUT, :debug),
+    VLC::System.new('127.0.0.1', 9999, auto_start: false))
+
+# run startup scan
+app.indexer.scan(app.root.path)
 
 if opts[:cli]
   api = Teevee::Wit::API.new(WIT_ACCESS_TOKEN)
@@ -91,9 +95,9 @@ if opts[:cli]
   exit 0
 end
 
-### daemonize if env is right
 threads = []
 
+# --web - natural language interface via mobile web
 if opts[:web]
   # start the webserver for the remote in a thread
   web = Thread.new do
@@ -102,6 +106,7 @@ if opts[:web]
   threads << web
 end
 
+# --remote - remote debugging interface pry-remote
 if opts[:remote]
   # start pry-remote in a thread
   debug = Thread.new do

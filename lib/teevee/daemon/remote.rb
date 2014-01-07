@@ -59,7 +59,7 @@ module Teevee
 
       post '/' do
         wit = Wit::API.new(WIT_ACCESS_TOKEN)
-        controller = Teevee::Daemon::IntentController.new
+        controller = Teevee::Daemon::IntentController.new(Teevee::Daemon.instance)
 
         @query = wit.query(params[:q])
         @intent_codez = h @query.pretty_inspect
@@ -71,7 +71,7 @@ module Teevee
           rescue UnknownIntent => err
             @intent_res = "UnknownIntent: #{err.to_s}"
           rescue Unimplemented => err
-            @intent_res = "Unimplemented."
+            @intent_res = 'Unimplemented.'
           end
         end
 

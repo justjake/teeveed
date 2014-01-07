@@ -12,12 +12,16 @@ gem 'haml'
 gem 'jdbc-sqlite3'
 gem 'data_mapper'
 gem 'dm-postgres-adapter'
+# gem 'dm-noisy-failures' # oh god why
 
 # used for class_attribute
 gem 'activesupport'
 
 # filesystem scanner
 gem 'listen', '~> 2.0'
+
+# media center
+gem 'vlc-client'
 
 group :development do
   gem 'pry-remote' # interactive console
