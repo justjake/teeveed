@@ -62,21 +62,39 @@ module Teevee
         stripped.gsub(self.suffix, SUFFIX)
       end
 
-      # import the file at `relative_path` under self.root as a new Media of
-      # this type
-      def self.index_path(rp, prefix)
+      def self.data_from_path(rp, prefix)
         stripped = stripped_path(rp, prefix)
 
         # TODO handle a no-match case
         match = self.regex.match(stripped)
         if match
           data = match_to_hash(match)
-          # TODO handle non-unique relative paths somehow
-          data[:relative_path] = rp
-          return self.new(data)
+          data[:relative_path] = rp.to_s
+          return data
         end
         return nil
       end
+
+      # import the file at `relative_path` under self.root as a new Media of
+      # this type
+      def self.index_path(rp, prefix)
+        data = data_from_path(rp, prefix)
+        return nil if data.nil?
+
+        # type coerce the data because DataMapper doesn't seem to do it for us
+        # i am having untold struggles with Indexer#scan because it won't save episdoes
+        # where ep.season = '04' instead of 4
+        int_props = self.properties.select{|p| p.is_a? DataMapper::Property::Integer}.map{|p| p.name}
+        int_props.delete(:id) # no need to cast ID
+        int_props.each do |name|
+          data[name] = data[name].to_i if data.include? name
+        end
+
+
+        return self.new(data) if data
+        return nil
+      end
+
 
       ### default matchers
       self.suffix = /\.\w{3,}$/
@@ -121,7 +139,7 @@ module Teevee
     class Episode < Media
       # like /Television/Game of Thrones/Season 02/Game of Thrones - S02E03 - What is Dead May Never Die.mp4
       property :show,           String
-      property :season,         Integer
+      property :season,         Integer # note that these two fields MUST be its to #save the model
       property :episode_num,    Integer
       property :grouping,       String # for episodes without seasons
       property :title,          String # for named episodes (most)

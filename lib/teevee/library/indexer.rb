@@ -14,6 +14,15 @@ module Teevee
           debug: true
       }.freeze
 
+      class ScanResults
+        attr_reader :created, :updated, :deleted
+        def initialize(cr, up, del)
+          @created = cr
+          @updated = up
+          @deleted = del
+        end
+      end
+
       # defines a method that is run for all listeners
       def self.listener_method(meth_name, &block)
         define_method(:meth_name) do
@@ -28,8 +37,9 @@ module Teevee
       def initialize(root, section_opts = {})
         @root = root
         @change_proc = Proc.new do |modified, added, removed|
-          added.each {|f| self.root.index_path(f)}
-          removed.each {|f| self.root.remove_path(f)}
+          DataMapper.logger.debug("Index changes: #{added.length} added, #{removed.length} removed")
+          added.each {|f| self.root.index_path(f).save }
+          removed.each {|f| self.root.remove_path(f).save }
         end
 
         @listeners = _init_listeners(section_opts)
@@ -48,34 +58,63 @@ module Teevee
 
       # Do a find on `path`. Update the last_seen properties of all found items
       # delete all items that start with that path who's last seen is too old
+      # TODO: fixme. somehow this is horribly, horribly broken
       def scan(full_path)
         start_time = DateTime.now
 
         items = root.index_recursive(full_path)
+        items[-2].save
+
+        created = []
+        updated = []
 
         # add/update transaction
         Media.transaction do
           items.each do |file|
+            log "checking file #{file.relative_path}"
             in_db = Media.first(:relative_path => file.relative_path)
             if in_db # already indexed once, just update the date and save it
-              in_db.last_seen = file.last_seen
-              in_db.save
+              log "\tOLD: #{file.relative_path} already in index, updating :last_seen"
+              in_db.last_seen = DateTime.now
+              updated << in_db
+              if in_db.save
+                log "\tsuccess."
+              else
+                log "\tFAILED"
+              end
+
             else # new file, just add it to the DB!
-              file.save
+              log "\tNEW: #{file.relative_path} new, saving for first time."
+              created << file
+              if file.save
+                log "\tsuccess."
+              else
+                log "\tFAILED"
+              end
             end
           end
         end
 
         # old items
         in_scan = Media.all(:relative_path.like => root.relative_path(full_path)+'%')
+        log "pruning: found #{in_scan.length} files under scan path in the index"
         stale = in_scan.all(:last_seen.lt => start_time)
+        log "pruning: found #{stale.length} stale files"
+        deleted = stale.to_a
+
         Media.transaction do
+          log "\tpruning: deleting"
           stale.destroy
         end
+
+        ScanResults.new(created, updated, deleted)
       end
 
-
       private
+
+      def log(text)
+        puts "Indexer: #{text}"
+      end
 
       def options_for_section(media_class)
         { :only => media_class.suffix }
