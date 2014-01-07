@@ -90,8 +90,6 @@ module Teevee
           data[name] = data[name].to_i if data.include? name
         end
 
-        binding.pry
-
         return self.new(data) if data
         return nil
       end

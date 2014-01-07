@@ -60,7 +60,7 @@ module Teevee
         if episode.attributes.include? :season and episode.attributes.include? :episode_num
           # we have a well-frormatted episode on our hands
           # build a playlist of the following episodes in the season
-          season = Teevee::Library::Episdoe.all(
+          season = Teevee::Library::Episode.all(
             :season => episode.season,
             :episode_num.gt => episode.episode_num,
             :order => [:episode_num.asc]
@@ -69,11 +69,11 @@ module Teevee
 
 
           # do vlc things
-          vlc = @app.vlc
-          vlc.start unless vlc.running?
-          vlc.clear # clear okaylist
-          vlc.play((@app.root.pathname + episode.relative_path).to_s)
-          playlist.each{|f| vlc.add_to_playlist(f) }
+          # vlc = @app.vlc
+          # vlc.start unless vlc.running?
+          # vlc.clear # clear okaylist
+          # vlc.play((@app.root.pathname + episode.relative_path).to_s)
+          # playlist.each{|f| vlc.add_to_playlist(f) }
 
           return playlist
         end
