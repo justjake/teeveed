@@ -6,6 +6,15 @@ require 'teevee/searchable'
 module Teevee
   module Library
 
+    # Times with fractional seconds screw up my Postgres queries
+    # this supplies us with a source of DateTime objects unclouded by fractional seconds
+    def self.rough_time(time = nil)
+      time = DateTime.now if time.nil?
+
+      time = time.to_time if time.is_a? DateTime
+      Time.at(time.to_i).to_datetime
+    end
+
     # Database storage class
     # we're using a database so we can take advantage of Postgres's built-in
     # full-text search. A fuzzy-matching search was considered but discarded
@@ -25,7 +34,7 @@ module Teevee
       # 1. started = Time.now
       # 2. scan each file, updating its :last_seen to Time.now
       # 3. DELETE FROM media WHERE last_seen < started
-      property :last_seen,      DateTime, :default => proc {DateTime.now}
+      property :last_seen,      DateTime, :default => proc {Library.rough_time}
 
 
       ### Full Text Search ####################################################
