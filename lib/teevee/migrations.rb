@@ -17,31 +17,28 @@ module Teevee
       end
     end
 
-    def self.add_text_indexing_seperate(table_name, prop_name)
+    # @ return [Array<String>] commands to run
+    def self.add_text_indexing(table_name, prop_name)
       table_name = table_name.to_s
       prop_name = prop_name.to_s
 
       col_name = prop_name + "_search_index"
 
       return [
-        "ALTER TABLE #{table_name} ADD COLUMN #{col_name} tsvector;",
-        "UPDATE #{table_name} SET #{col_name} = to_tsvector('english', coalesce(#{prop_name},''));",
+        "ALTER TABLE #{table_name} ADD COLUMN #{col_name} tsvector",
+        "UPDATE #{table_name} SET #{col_name} = to_tsvector('english', coalesce(#{prop_name},''))",
         "CREATE TRIGGER #{prop_name}_index_update BEFORE INSERT OR UPDATE ON #{table_name}
             FOR EACH ROW EXECUTE PROCEDURE
-            tsvector_update_trigger(#{col_name}, 'pg_catalog.english', #{prop_name});"
+            tsvector_update_trigger(#{col_name}, 'pg_catalog.english', #{prop_name})"
       ]
     end
 
     # postgres commands to add a full-text-search index to a
     # tabel
-    # @return [String]
-    def self.add_text_indexing(table_name, prop_name)
-      add_text_indexing_seperate.join("\n")
-    end # add_text_indexing
-
-    def self.remove_text_indexing_seperate(table_name, prop_name)
+    # @return [Array<String>] commands to run
+    def self.remove_text_indexing(table_name, prop_name)
       return [
-        "ALTER TABLE #{table_name} DROP COLUMN #{prop_name}_search_index;",
+        "ALTER TABLE #{table_name} DROP COLUMN #{prop_name}_search_index",
         "DROP TRIGGER #{prop_name}_index_update ON #{table_name}"
       ]
     end
@@ -72,7 +69,7 @@ module Teevee
           up do
             repo.transaction.commit do
               cols.each do |col_name|
-                sql = Teevee::Migrations.add_text_indexing_seperate(TABLE_NAME, col_name)
+                sql = Teevee::Migrations.add_text_indexing(TABLE_NAME, col_name)
                 sql.each {|line| adapter.execute(line)}
                 # adapter.execute(sql)
               end
@@ -82,7 +79,7 @@ module Teevee
           down do
             repo.transaction.commit do
               cols.each do |col_name|
-                sql = Teevee::Migrations.remove_text_indexing_seperate(TABLE_NAME, col_name)
+                sql = Teevee::Migrations.remove_text_indexing(TABLE_NAME, col_name)
                 sql.each {|line| adapter.execute(line)}
               end
             end # transaction.commit
