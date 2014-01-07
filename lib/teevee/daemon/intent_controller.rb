@@ -1,3 +1,4 @@
+require 'teevee/library'
 module Teevee
   module Daemon
 
@@ -11,18 +12,42 @@ module Teevee
     # to bring it to fruition
     class IntentController
 
-      KNOWN_INTENTS = [
-          :query_episode,
-          :query_movie,
-          :query_song,
-
-          :find_hosers,
-          :fix_mount_point
-      ]
-
       def handle_intent(intent)
+        if self.respond_to? intent.type
+          return self.send(intent.type, intent)
+        end
         raise UnknownIntent, "Unknown intent: #{intent}" unless KNOWN_INTENTS.include? intent.type
-        raise Unimplemented, "unimplemented"
+      end
+
+      def query_episode(intent)
+        # build query from definite paramters
+        name_mapping = {
+            :season => :season,
+            :episode => :episode_num,
+        }
+
+        query = {}
+        name_mapping.each do |wit, db|
+          if intent.entities.include? wit
+            query[db] = intent.entities[wit].value
+          end
+        end
+
+        results = Teevee::Library::Episode.all(query)
+
+        # fuzzy matching stuff
+        if intent.entities.include? :title
+          # title => search "show"
+          episodes = results.search(intent.entities[:title].value, :search_indexes => [:show])
+          results = episodes if episodes.length > 0
+        end
+
+        if intent.entities.include? :episode_name
+          episodes = results.search(intent.entities[:episode_name].value, :search_indexes => [:title])
+          results = episodes if episodes.length > 0
+        end
+
+        return results
       end
 
     end

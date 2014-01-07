@@ -43,7 +43,7 @@ module Teevee
       # @param [Hash] options
       # @param [Array<Symbol>] options[:search_indexes] which fields to search
       def search(query, options = {})
-        given_search_indexes = options[:search_indexes] || all_search_indexes
+        given_search_indexes = options.delete(:search_indexes) || all_search_indexes
         conds = given_search_indexes.map do |index|
           "#{index}_search_index @@ plainto_tsquery(?)"
         end

@@ -67,6 +67,7 @@ module Teevee
         if @query.outcome.is_a? Wit::Intent
           begin
             @intent_res = controller.handle_intent(@query.outcome)
+            @intent_res = h @intent_res.pretty_inspect
           rescue UnknownIntent => err
             @intent_res = "UnknownIntent: #{err.to_s}"
           rescue Unimplemented => err
