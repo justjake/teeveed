@@ -34,7 +34,6 @@ module Teevee
       end
 
       # True if the given path is in this root
-      # TODO: this is broken and does not enforce the constraint
       #   FIXIT
       def in_root?(path)
         fp = Pathname.new(path).realpath

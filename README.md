@@ -15,6 +15,12 @@ Drip'll put the spring back in your step!
 
 TODO: tests or something
 
+## Requirements
+
+- JRuby 1.7.x
+- PostgreSQL 9.1+ *with* the `pg_trgm` extension! **pg_trgm** is one
+  of the ways we find similar-text matches
+
 ## Goals
 
 ### Index

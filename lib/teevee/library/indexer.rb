@@ -58,12 +58,12 @@ module Teevee
 
       # Do a find on `path`. Update the last_seen properties of all found items
       # delete all items that start with that path who's last seen is too old
-      # TODO: fixme. somehow this is horribly, horribly broken
+      # this breaks in strange ways if any Integer properties are provided as strings
+      # (eg, '02' instead of 2)... which leads to silent save failures, etc
       def scan(full_path)
         start_time = DateTime.now
 
         items = root.index_recursive(full_path)
-        items[-2].save
 
         created = []
         updated = []
