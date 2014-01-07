@@ -8,7 +8,7 @@ require 'trollop'
 opts = Trollop::options do
   # opt :indexer, "Launch indexer. currently unimplemented"
   opt :cli, "boot into a local pry session"
-  opt :remote, "Launch remote pry debug server", default: true
+  opt :remote, "Launch remote pry debug server"
 
   opt :web, "Launch webserver", default: true
   opt :ip, "listening ip for the web ui", :default => '0.0.0.0'
@@ -77,15 +77,16 @@ root = Teevee::Library::Root.new (TEEVEED_HOME+'library').to_s, {
     'Television' => Teevee::Library::Episode,
     'Movies' => Teevee::Library::Movie
 }
-# test importing of the whole shebang
-imported = root.index_recusive(root.path)
-imported.each do |repr|
-  puts "Imported #{repr.relative_path}:\n\t#{repr.inspect}"
-end
+# # test importing of the whole shebang
+# imported = root.index_recusive(root.path)
+# imported.each do |repr|
+#   puts "Imported #{repr.relative_path}:\n\t#{repr.inspect}"
+# end
 
 
 if opts[:cli]
   api = Teevee::Wit::API.new(WIT_ACCESS_TOKEN)
+  indexer = Teevee::Library::Indexer.new(root)
   binding.pry
   exit 0
 end

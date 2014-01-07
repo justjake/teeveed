@@ -38,7 +38,7 @@ module Teevee
       #   FIXIT
       def in_root?(path)
         fp = Pathname.new(path).realpath
-        return true if fp.relative_path_from(self.pathname)
+        fp.to_s.start_with? self.path
       rescue ArgumentError
         return false
       end
@@ -52,7 +52,20 @@ module Teevee
       # @return String
       def relative_path(full_path)
         full_path = Pathname.new(full_path).realpath
-        full_path.relative_path_from(self.pathname).to_s
+        path = full_path.relative_path_from(self.pathname).to_s
+
+        # we don't want the dot because we never save any dots
+        if path == '.'
+          return ''
+        end
+
+        return path
+      end
+
+      def section_for_path(full_path)
+        fp = Pathname.new(full_path).realpath
+        rp = relative_path(fp).to_s
+        @sections.keys.find {|prefix| rp.start_with? (prefix + '/') }
       end
 
       # index a file into the library. basic algorithm:
@@ -77,15 +90,18 @@ module Teevee
           path_not_under_error fp
         end
 
-        rp = fp.relative_path_from(self.pathname).to_s
-        prefix = @sections.keys.find {|prefix| rp.start_with? (prefix + '/') }
+        rp = relative_path(fp).to_s
 
-        @sections[prefix].index_path(rp, prefix)
+        section = section_for_path(full_path)
+        if section
+          @sections[section].index_path(rp, section)
+        end
       end
+
 
       # indexes all files in path, recursivley
       # @param start [String, Pathname] start of directory traversal
-      def index_recusive(start)
+      def index_recursive(start)
         # check start is a good path.
         start = Pathname.new(start).realpath
         path_not_under_error(start.to_s) unless in_root? start
@@ -97,18 +113,6 @@ module Teevee
           indexed << repr if repr
         end
         indexed
-      end
-
-      # remove a path from the index
-      def remove_path(full_path)
-        full_path = Pathname.new(full_path).realpath.to_s
-        unless in_root? full_path
-          path_not_under_error full_path
-        end
-
-        rp = relative_path(full_path)
-        repr = Media.first(:relative_path => rp)
-        repr.delete!
       end
     end
 
