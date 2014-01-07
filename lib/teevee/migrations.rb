@@ -11,34 +11,6 @@ module Teevee
 
     # workaround for https://github.com/datamapper/dm-migrations/issues/30
     # which prevents DataMapper.auto_* methods from being using inside migration's eval stuff
-    class FakeMigration
-      attr_accessor :up, :down,
-                    :position,
-                    :name,
-                    :repository
-      def initialize(position, name)
-        @position = position
-        @name = name
-      end
-      def perform_up
-        up.call
-      end
-      def perform_down
-        down.call
-      end
-
-      def say_with_time(message, indent = 2)
-        say(message, indent)
-        result = nil
-        time = Benchmark.measure { result = yield }
-        say("-> %.4fs" % time.real, indent)
-        result
-      end
-    end
-
-
-    # workaround for https://github.com/datamapper/dm-migrations/issues/30
-    # which prevents DataMapper.auto_* methods from being using inside migration's eval stuff
     class Migration < DataMapper::Migration
       def setup!
         @adapter = DataMapper.repository(@repository).adapter
@@ -79,6 +51,7 @@ module Teevee
     # @param media_classes [Array<CLass>] top-level classes that include Searchable
     def self.generate(*media_classes)
       migrations = []
+      repo = DataMapper.repository(:default)
 
       # automatic migration for EVERYTHING
       # uses private methods, but... ez
@@ -94,22 +67,29 @@ module Teevee
       # indexes on all subclasses of Media
       media_classes.each do |klass|
         cols = klass.all_search_indexes
+
         indexes = Migration.new 2, :search_indexes do
           up do
-            cols.each do |col_name|
-              sql = Teevee::Migrations.add_text_indexing_seperate(TABLE_NAME, col_name)
-              sql.each {|line| adapter.execute(line)}
-              # adapter.execute(sql)
-            end
+            repo.transaction.commit do
+              cols.each do |col_name|
+                sql = Teevee::Migrations.add_text_indexing_seperate(TABLE_NAME, col_name)
+                sql.each {|line| adapter.execute(line)}
+                # adapter.execute(sql)
+              end
+            end #transaction.commit
           end #up
 
           down do
-            cols.each do |col_name|
-              sql = Teevee::Migrations.remove_text_indexing_seperate(TABLE_NAME, col_name)
-              sql.each {|line| adapter.execute(line)}
-            end
+            repo.transaction.commit do
+              cols.each do |col_name|
+                sql = Teevee::Migrations.remove_text_indexing_seperate(TABLE_NAME, col_name)
+                sql.each {|line| adapter.execute(line)}
+              end
+            end # transaction.commit
           end # down
-        end #indexes
+
+        end #indexes migration
+
         migrations << indexes
       end
 
