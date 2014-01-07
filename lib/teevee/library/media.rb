@@ -49,7 +49,7 @@ module Teevee
       # for use with named captures in a regex
       def self.match_to_hash(match)
         res = {}
-        match.names.each {|name| res[name] = match[name]}
+        match.names.each {|name| res[name.to_sym] = match[name]}
         res
       end
 
@@ -90,6 +90,7 @@ module Teevee
           data[name] = data[name].to_i if data.include? name
         end
 
+        binding.pry
 
         return self.new(data) if data
         return nil
