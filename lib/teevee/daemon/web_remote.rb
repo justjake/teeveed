@@ -6,7 +6,7 @@ module Teevee
 
     # Web-based remote control interface for requesting actions
     # right now all it does is pass a <textarea> to Wit.ai
-    class Remote < Sinatra::Base
+    class WebRemote < Sinatra::Base
       ### SETTINGS
       set :bind, REMOTE_IP
       set :port, REMOTE_PORT
@@ -58,7 +58,7 @@ module Teevee
       end
 
       post '/' do
-        wit = Wit::API.new(WIT_ACCESS_TOKEN)
+        wit = Wit::API.new(Daemon.instance.options[:wit_token])
         controller = Teevee::Daemon::IntentController.new(Teevee::Daemon.instance)
 
         @query = wit.query(params[:q])

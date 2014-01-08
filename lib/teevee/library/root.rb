@@ -106,11 +106,18 @@ module Teevee
         path_not_under_error(start.to_s) unless in_root? start
 
         indexed = []
+
         start.find do |path|
+          # skip things outside of library sections
+          Find.prune unless section_for_path(path)
+
+          # only index files
           next unless path.file?
+
           repr = self.index_path(path)
           indexed << repr if repr
         end
+
         indexed
       end
     end

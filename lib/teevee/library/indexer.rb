@@ -23,13 +23,6 @@ module Teevee
         end
       end
 
-      # defines a method that is run for all listeners
-      def self.listener_method(meth_name, &block)
-        define_method(:meth_name) do
-          @listeners.each(&block)
-        end
-      end
-
       # @param root [Root] we will manage index creation for this library root
       # @param section_opts [Hash<String, Hash>] map between library section
       #   prefixes (like "Movies")and options to the Listener for those sections.
@@ -37,12 +30,33 @@ module Teevee
       def initialize(root, section_opts = {})
         @root = root
         @change_proc = Proc.new do |modified, added, removed|
-          DataMapper.logger.debug("Index changes: #{added.length} added, #{removed.length} removed")
-          added.each {|f| self.root.index_path(f).save }
-          removed.each {|f| self.root.remove_path(f).save }
+          log 'update', "#{added.length} added, #{removed.length} removed"
+
+          added.each do |f|
+            file = self.root.index_path(f)
+            if file.save
+              log 'update', "added new file #{file} to index"
+            else
+              log 'update', "couldn't add #{file} to index"
+            end
+          end
+
+          removed.each do |f|
+            rel_path = self.root.relative_path(f)
+            log 'update', "file at #{rel_path} removed from filesystem"
+            file = Library::Media.first(:relative_path => rel_path)
+
+            log 'update', "deleting index of #{file}" unless file.nil?
+            file.destroy unless file.nil?
+          end
         end
 
-        @listeners = _init_listeners(section_opts)
+        @listeners = {}
+        self.root.sections.each do |path, section|
+          opts = DEFAULT_LISTENER_OPTIONS.merge(section_opts[path] || {})
+          .merge(options_for_section(section) || {})
+          @listeners[path] = Listen.to((root.pathname+path).to_s, opts, &@change_proc)
+        end
       end
 
 
@@ -73,7 +87,9 @@ module Teevee
           items.each do |file|
             log "checking file #{file.relative_path}"
             in_db = Media.first(:relative_path => file.relative_path)
-            if in_db # already indexed once, just update the date and save it
+
+            # already indexed once, just update the date and save it
+            if in_db
               log "\tOLD: #{file.relative_path} already in index, updating :last_seen"
               in_db.last_seen = DateTime.now
               updated << in_db
@@ -81,7 +97,8 @@ module Teevee
                 throw "Database save error: #{in_db}.save failed"
               end
 
-            else # new file, just add it to the DB!
+            # new file, just add it to the DB!
+            else
               log "\tNEW: #{file.relative_path} new, saving for first time."
               created << file
               if not file.save
@@ -91,7 +108,6 @@ module Teevee
           end
         end
 
-        # TODO: the stale selector here often selects the whole library which is bad
         # old items
         in_scan = Media.all(:relative_path.like => root.relative_path(full_path)+'%')
         log "pruning: found #{in_scan.length} files under scan path in the index"
@@ -108,22 +124,12 @@ module Teevee
 
       private
 
-      def log(text)
-        puts "Indexer: #{text}"
+      def log(*texts)
+        puts "Indexer: #{texts.join(': ')}"
       end
 
       def options_for_section(media_class)
         { :only => media_class.suffix }
-      end
-
-      def _init_listeners(sect_opts)
-        listeners = {}
-        self.root.sections.each do |path, section|
-          opts = DEFAULT_LISTENER_OPTIONS.merge(sect_opts[path] || {})
-            .merge(options_for_section(section) || {})
-          listeners[path] = Listen.to((root.pathname+path).to_s, opts, &@change_proc)
-        end
-        listeners
       end
 
     end
