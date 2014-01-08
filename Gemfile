@@ -23,6 +23,9 @@ gem 'listen', '~> 2.0'
 # media center
 gem 'vlc-client', :git => 'git://github.com/justjake/vlc-client.git'
 
+# scheduling
+gem 'rufus-scheduler', '~> 3.0'
+
 group :development do
   gem 'pry-remote' # interactive console
   # gem 'warbler' # jar builder for deployment

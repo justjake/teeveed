@@ -31,4 +31,4 @@ end
 require 'teevee/daemon/intent_controller'
 require 'teevee/daemon/cli'
 require 'teevee/daemon/web_remote'
-require 'teevee/daemon/runner'
+require 'teevee/daemon/runtime'

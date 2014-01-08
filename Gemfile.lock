@@ -15,7 +15,9 @@ GEM
       thread_safe (~> 0.1)
       tzinfo (~> 0.3.37)
     addressable (2.3.5)
+    atomic (1.1.14)
     atomic (1.1.14-java)
+    bcrypt-ruby (3.1.2)
     bcrypt-ruby (3.1.2-java)
     celluloid (0.15.2)
       timers (~> 1.1.0)
@@ -68,6 +70,8 @@ GEM
       dm-core (~> 1.2.0)
     do_jdbc (0.10.13-java)
       data_objects (= 0.10.13)
+    do_postgres (0.10.13)
+      data_objects (= 0.10.13)
     do_postgres (0.10.13-java)
       data_objects (= 0.10.13)
       do_jdbc (= 0.10.13)
@@ -77,12 +81,14 @@ GEM
     faraday_middleware (0.8.8)
       faraday (>= 0.7.4, < 0.9)
     fastercsv (1.5.5)
+    ffi (1.9.3)
     ffi (1.9.3-java)
     haml (4.0.5)
       tilt
     i18n (0.6.9)
     jdbc-postgres (9.3.1100)
     jdbc-sqlite3 (3.7.2.1)
+    json (1.8.1)
     json (1.8.1-java)
     json_pure (1.8.1)
     listen (2.4.0)
@@ -93,6 +99,10 @@ GEM
     minitest (4.7.5)
     multi_json (1.8.2)
     multipart-post (1.2.0)
+    pry (0.9.12.4)
+      coderay (~> 1.0)
+      method_source (~> 0.8)
+      slop (~> 3.4)
     pry (0.9.12.4-java)
       coderay (~> 1.0)
       method_source (~> 0.8)
@@ -108,6 +118,8 @@ GEM
     rb-inotify (0.9.3)
       ffi (>= 0.5.0)
     retryable (1.3.4)
+    rufus-scheduler (3.0.3)
+      tzinfo
     sinatra (1.4.4)
       rack (~> 1.4)
       rack-protection (~> 1.4)
@@ -116,6 +128,8 @@ GEM
     spoon (0.0.4)
       ffi
     stringex (1.5.1)
+    thread_safe (0.1.3)
+      atomic
     thread_safe (0.1.3-java)
       atomic
     tilt (1.4.1)
@@ -136,5 +150,6 @@ DEPENDENCIES
   jdbc-sqlite3
   listen (~> 2.0)
   pry-remote
+  rufus-scheduler (~> 3.0)
   sinatra
   vlc-client!

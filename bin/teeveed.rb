@@ -7,21 +7,22 @@
 require 'trollop'
 opts = Trollop::options do
   # opt :indexer, "Launch indexer. currently unimplemented"
-  opt :cli, "boot into a local pry session"
-  opt :remote, "Launch remote pry debug server"
+  opt :cli, 'boot into a local pry session'
+  opt :remote, 'Launch remote pry debug server'
 
-  opt :web, "Launch webserver", default: true
-  opt :ip, "listening ip for the web ui", :default => '0.0.0.0'
-  opt :port, "listening port for the web ui", :default => '1337'
+  opt :web, 'Launch webserver'
+  opt :ip, 'listening ip for the web ui'
+  opt :port, 'listening port for the web ui'
 
-  opt :migrate, "Destroy and re-create the database"
-  opt :down, "migrate down - undo migration #X", :type => :ints
-  opt :up, "migrate up - perform migrations #X", :type => :ints
-  opt :trash, "trash any exisiting migration state data"
+  opt :migrate, 'Destroy and re-create the database'
+  opt :down, 'migrate down - undo migration #X', :type => :ints
+  opt :up, 'migrate up - perform migrations #X', :type => :ints
+  opt :force, 'force migrate. destroys whole database'
 
-  opt :wit_token, "wit oauth2 access token.", :type => :string
+  opt :wit_token, 'wit oauth2 access token. Can also be provided via $WIT_ACCESS_TOKEN', :type => :string
 
-  opt :config, "config file to load", :default => "#{ENV['HOME']}/.teeveed.conf.rb"
+  opt :config, 'config file to load', :default => "#{ENV['HOME']}/.teeveed.conf.rb"
+  opt :scan, 'scan library at boot'
 end
 # default to empty arrays
 [:up, :down].each{|name| opts[name] ||= []}
@@ -37,12 +38,12 @@ require 'teevee'
 require 'teevee/daemon'
 
 # engage tricky business
-Teevee::Daemon::Runner.initial_options(opts)
-include Teevee::Daemon::Runner
+include Teevee::Daemon::Runtime
+initial_options(opts)
 
 # load user config
 begin
-  load config_path
+  load opts[:config]
 rescue LoadError => e
   Trollop::die :config, "load error: #{e.message}"
 end

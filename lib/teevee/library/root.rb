@@ -34,12 +34,9 @@ module Teevee
       end
 
       # True if the given path is in this root
-      #   FIXIT
       def in_root?(path)
         fp = Pathname.new(path).realpath
         fp.to_s.start_with? self.path
-      rescue ArgumentError
-        return false
       end
 
       # TODO replace with an exception type
@@ -97,6 +94,11 @@ module Teevee
         end
       end
 
+      # list of full paths of all the sections
+      def section_paths
+        @sections.keys.map {|k| (pathname + k).to_s}
+      end
+
 
       # indexes all files in path, recursivley
       # @param start [String, Pathname] start of directory traversal
@@ -108,14 +110,15 @@ module Teevee
         indexed = []
 
         start.find do |path|
-          # skip things outside of library sections
-          Find.prune unless section_for_path(path)
+          if in_root? path or section_paths.include? path.to_s
+            # only index files
+            next unless path.file?
 
-          # only index files
-          next unless path.file?
-
-          repr = self.index_path(path)
-          indexed << repr if repr
+            repr = self.index_path(path)
+            indexed << repr if repr
+          else
+            Find.prune
+          end
         end
 
         indexed

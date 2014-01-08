@@ -7,10 +7,6 @@ module Teevee
     # Web-based remote control interface for requesting actions
     # right now all it does is pass a <textarea> to Wit.ai
     class WebRemote < Sinatra::Base
-      ### SETTINGS
-      set :bind, REMOTE_IP
-      set :port, REMOTE_PORT
-
       helpers do
         def h(text)
           Rack::Utils.escape_html(text)
