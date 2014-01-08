@@ -30,8 +30,7 @@ end
 opts[:wit_token] ||= ENV['WIT_ACCESS_TOKEN']
 
 require 'rubygems'
-require 'bundler'
-Bundler.setup
+require 'bundler/setup'
 
 # our software
 require 'teevee'

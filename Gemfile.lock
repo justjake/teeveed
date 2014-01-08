@@ -87,6 +87,7 @@ GEM
     rack-protection (1.5.1)
       rack
     rake (10.1.1)
+    retryable (1.3.4)
     rubyzip (1.0.0)
     rufus-scheduler (3.0.3)
       tzinfo
@@ -115,11 +116,13 @@ PLATFORMS
 
 DEPENDENCIES
   activesupport
+  bundler
   data_mapper
   dm-postgres-adapter
   faraday (~> 0.8.0)
   haml
   pry-remote
+  retryable (~> 1.3)
   rufus-scheduler (~> 3.0)
   sinatra
-  warbler
+  warbler (~> 1.4.0)

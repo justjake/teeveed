@@ -1,5 +1,7 @@
 source "https://rubygems.org"
 
+gem 'bundler' # lol
+
 # faraday handles API requests to Wit.ai
 gem 'faraday', '~>0.8.0'
 
@@ -20,6 +22,9 @@ gem 'rufus-scheduler', '~> 3.0'
 # used for remote interface
 gem 'pry-remote' # interactive console
 
+# for vlc-client
+gem 'retryable', '~> 1.3'
+
 group :development do
-  gem 'warbler' # jar builder for deployment
+  gem 'warbler', '~> 1.4.0' # jar builder for deployment
 end

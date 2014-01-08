@@ -1,0 +1,145 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>org.teton_landis.jake.teeveed</groupId>
+  <artifactId>teeveed</artifactId>
+  <version>0.1.0-SNAPSHOT</version>
+  <packaging>jar</packaging>
+
+  <name>teeveed</name>
+  <url>https://github.com/justjake/teeveed</url>
+
+  <!-- following a guide on shaded jars with jruby
+       http://corner.squareup.com/2013/07/maven-gems-and-a-jruby-repl.html -->
+
+  <repositories>
+    <repository>
+      <id>rubygems-release</id>
+      <url>http://rubygems-proxy.torquebox.org/releases</url>
+    </repository>
+  </repositories>
+
+  <build>
+    <plugins>
+      <!-- install rubygems into target/rubygems -->
+      <plugin>
+        <groupId>de.saumya.mojo</groupId>
+        <artifactId>gem-maven-plugin</artifactId>
+        <version>1.0.0-beta</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>initialize</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+
+      <!-- construct jar according to assembly.xml -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-assembly-plugin</artifactId>
+        <version>2.2-beta-3</version> <!-- may need an update -->
+        <executions>
+          <execution>
+            <id>assemble</id>
+            <goals>
+              <goal>single</goal>
+            </goals>
+            <phase>package</phase>
+            <configuration>
+              <!-- use the JRuby Jar Bootstrapper, runs jar-boostrap.rb -->
+              <archive>
+                <manifest>
+                  <mainClass>org.jruby.JarBootstrapMain</mainClass>
+                </manifest>
+              </archive>
+              <appendAssemblyId>false</appendAssemblyId>
+              <descriptors>
+                <descriptor>assembly.xml</descriptor>
+              </descriptors>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
+    </plugins>
+  </build>
+
+  <dependencies>
+    <!-- GEMS -->
+    <dependency>
+      <groupId>rubygems</groupId>
+      <artifactId>bundler</artifactId>
+      <version>1.5.1</version>
+      <type>gem</type>
+    </dependency>
+
+    <dependency>
+      <groupId>rubygems</groupId>
+      <artifactId>activesupport</artifactId>
+      <version>3.2.16</version>
+      <type>gem</type>
+    </dependency>
+
+    <dependency>
+      <groupId>rubygems</groupId>
+      <artifactId>data_mapper</artifactId>
+      <version>1.2.0</version>
+      <type>gem</type>
+    </dependency>
+
+    <dependency>
+      <groupId>rubygems</groupId>
+      <artifactId>dm-postgres-adapter</artifactId>
+      <version>1.2.0</version>
+      <type>gem</type>
+    </dependency>
+
+    <dependency>
+      <groupId>rubygems</groupId>
+      <artifactId>faraday</artifactId>
+      <version>0.8.8</version>
+      <type>gem</type>
+    </dependency>
+
+    <dependency>
+      <groupId>rubygems</groupId>
+      <artifactId>haml</artifactId>
+      <version>4.0.5</version>
+      <type>gem</type>
+    </dependency>
+
+    <dependency>
+      <groupId>rubygems</groupId>
+      <artifactId>pry-remote</artifactId>
+      <version>0.1.7</version>
+      <type>gem</type>
+    </dependency>
+
+    <dependency>
+      <groupId>rubygems</groupId>
+      <artifactId>rufus-scheduler</artifactId>
+      <version>3.0.3</version>
+      <type>gem</type>
+    </dependency>
+
+    <dependency>
+      <groupId>rubygems</groupId>
+      <artifactId>sinatra</artifactId>
+      <version>1.4.4</version>
+      <type>gem</type>
+    </dependency>
+
+
+    <!-- Regular Dependencies -->
+    <dependency>
+      <groupId>org.jruby</groupId>
+      <artifactId>jruby-complete</artifactId>
+      <version>1.7.9</version>
+    </dependency>
+  </dependencies>
+
+
+</project>
