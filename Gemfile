@@ -21,7 +21,7 @@ gem 'activesupport'
 gem 'listen', '~> 2.0'
 
 # media center
-gem 'vlc-client'
+gem 'vlc-client', :git => 'git://github.com/justjake/vlc-client.git'
 
 group :development do
   gem 'pry-remote' # interactive console
