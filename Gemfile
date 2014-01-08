@@ -14,13 +14,12 @@ gem 'dm-postgres-adapter'
 # used for class_attribute
 gem 'activesupport'
 
-# media center
-gem 'vlc-client', :git => 'git://github.com/justjake/vlc-client.git'
-
 # scheduling
 gem 'rufus-scheduler', '~> 3.0'
 
+# used for remote interface
+gem 'pry-remote' # interactive console
+
 group :development do
-  gem 'pry-remote' # interactive console
-  # gem 'warbler' # jar builder for deployment
+  gem 'warbler' # jar builder for deployment
 end
