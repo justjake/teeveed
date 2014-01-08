@@ -1,5 +1,3 @@
-require 'listen'
-
 module Teevee
   module Library
 
