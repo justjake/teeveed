@@ -99,6 +99,9 @@ module Teevee
         @sections.keys.map {|k| (pathname + k).to_s}
       end
 
+      def abs_path(rel)
+        (pathname + rel).to_s
+      end
 
       # indexes all files in path, recursivley
       # @param start [String, Pathname] start of directory traversal

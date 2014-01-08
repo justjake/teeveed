@@ -30,9 +30,29 @@ module Teevee
 
       def handle_intent(intent)
         if self.respond_to? intent.type
+          log 3, "Handling a #{intent.type.to_s} intent"
           return self.send(intent.type, intent)
         end
         raise UnknownIntent, "Unknown intent: #{intent}" unless KNOWN_INTENTS.include? intent.type
+      end
+
+      def query_movie(intent)
+        # fuzzy matching stuff
+        if intent.entities.include? :title
+          movies = Teevee::Library::Movie.search(intent.entities[:title].value, :search_indexes => [:title])
+          log 4, "found #{movies.length} title=#{intent.entities[:title].value}"
+
+          if movies.length > 0
+            Thread.new do
+              vlc.connect
+              vlc.play @app.root.abs_path(movies[0].relative_path)
+            end
+            return movies[0]
+          end
+
+        end # end if
+        'No results found.'
+
       end
 
       def query_episode(intent)
@@ -56,13 +76,13 @@ module Teevee
         # fuzzy matching stuff
         if intent.entities.include? :title
           episodes = results.search(intent.entities[:title].value, :search_indexes => [:show])
-          log "found #{episodes.length} show=#{intent.entities[:title].value}"
+          log 4, "found #{episodes.length} show=#{intent.entities[:title].value}"
           results = episodes if episodes.length > 0
         end
 
         if intent.entities.include? :episode_name
           episodes = results.search(intent.entities[:episode_name].value, :search_indexes => [:title])
-          log "found #{episodes.length} title=#{intent.entities[:episode_name].value}"
+          log 4, "found #{episodes.length} title=#{intent.entities[:episode_name].value}"
           results = episodes if episodes.length > 0
         end
 
@@ -81,23 +101,28 @@ module Teevee
             :order => [:episode_num.asc]
           ).to_a
 
-          playlist = season.map{ |f| (@app.root.pathname + f.relative_path).to_s }
+          playlist = season.map{ |f| @app.root.abs_path f.relative_path }
 
           Thread.new do
             vlc.connect
             vlc.clear # clear pkaylist
-            vlc.play((@app.root.pathname + episode.relative_path).to_s)
+            vlc.play(@app.root.abs_path(episode.relative_path))
             playlist.each{|f| vlc.add_to_playlist(f) }
           end
 
           return playlist
         end
 
+        Thread.new do
+          vlc.connect
+          vlc.play @app.root.abs_path(episode.relative_path)
+        end
         return episode
+
       end # query_episode
 
-      def log(*things)
-        puts "IntentController: #{things.join(': ')}"
+      def log(level, *things)
+        Teevee.log(level, 'IntentController', *things)
       end
 
     end

@@ -4,10 +4,10 @@ module Teevee
   module Daemon
     # a scope for performing configuration
     module Runtime
+      include Teevee::Library
 
       # occurs when the config does not define a required section
       class ConfigError < StandardError; end
-      include Teevee::Library
 
       class SectionConstructor
         attr_reader :sections
@@ -36,6 +36,20 @@ module Teevee
 
       def scan_at_startup
         @options[:scan] = true
+      end
+
+      # set the log level
+      # 0 = only critical
+      # 4 = prunings
+      # 5 = item scans
+      def log_level(int)
+        Teevee.log_level= int
+      end
+
+      # pass through for configs
+      # intended to be used from a scheduled thing
+      def log(level, *texts)
+        Teevee.log(level, 'Config', *texts)
       end
 
       # turn on and configure the webui
@@ -86,7 +100,6 @@ module Teevee
         Library::Media.all.destroy
         scan_for_changes(@root.path)
       end
-
 
       def boot!
         # guards
