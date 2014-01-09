@@ -109,13 +109,17 @@ module Teevee
       end
 
       def boot!
+        opts = @options
+
         # guards
         raise ConfigError, "No library defined." unless @root
         raise ConfigError, "No database connected." unless @finalized
+        if opts[:web] and not opts[:wit_token]
+          Trollop::die :wit_token, 'the web ui requires a wit token'
+        end
 
         Teevee.log 0, 'boot', 'STARTING TEEVEED'
         # lots of this code comes from the old teeveed.rb
-        opts = @options
 
         # finish this puppy up
         DataMapper.finalize
