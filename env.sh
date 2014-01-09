@@ -10,10 +10,7 @@ alias teeveed="$PROJECT_ROOT/bin/teeveed.rb --config $PROJECT_ROOT/config/test.t
 alias cli="teeveed --cli"
 
 function rebuild {
-    set -e
     pushd $PROJECT_ROOT
-    rm -r $PROJECT_ROOT/target/surefile
-    rm -r $PROJECT_ROOT/target/classes
     rm -r $PROJECT_ROOT/target/*.jar
     mvn install
     popd
