@@ -77,7 +77,7 @@ module Teevee
       private
 
       def log(level, *texts)
-        Teevee.log(level, *texts)
+        Teevee.log(level, 'indexer', *texts)
       end
 
     end

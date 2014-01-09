@@ -97,7 +97,7 @@ module Teevee
           # build a playlist of the following episodes in the season
           season = Teevee::Library::Episode.all(
             :season => episode.season,
-            :episode_num.gt => episode.episode_num,
+            :episode_num.gte => episode.episode_num,
             :order => [:episode_num.asc]
           ).to_a
 
@@ -106,8 +106,8 @@ module Teevee
           Thread.new do
             vlc.connect
             vlc.clear # clear pkaylist
-            vlc.play(@app.root.abs_path(episode.relative_path))
             playlist.each{|f| vlc.add_to_playlist(f) }
+            vlc.play
           end
 
           return playlist

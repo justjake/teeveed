@@ -23,6 +23,7 @@ opts = Trollop::options do
 
   opt :config, 'config file to load', :default => "#{ENV['HOME']}/.teeveed.conf.rb"
   opt :scan, 'scan library at boot'
+  opt :verbosity, 'set the log level', :type => :int, :default => 3
 end
 # default to empty arrays
 [:up, :down].each{|name| opts[name] ||= []}
@@ -33,12 +34,16 @@ opts[:wit_token] ||= ENV['WIT_ACCESS_TOKEN']
 require 'teevee'
 require 'teevee/daemon'
 
+# prepare logging
+Teevee.log_level = opts[:verbosity]
+
 # engage tricky business
 include Teevee::Daemon::Runtime
 initial_options(opts)
 
 # load user config
 begin
+  Teevee.log(5, 'boot', 'loading user config...')
   load opts[:config]
 rescue LoadError => e
   Trollop::die :config, "load error: #{e.message}"

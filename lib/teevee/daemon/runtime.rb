@@ -23,8 +23,10 @@ module Teevee
         end
       end
 
+      # sets the options as they were before user config was loaded
       def initial_options(opts)
-        @options = opts
+        @original_opts = opts
+        @options = opts.dup
       end
 
       def enable_remote_debugging
@@ -39,18 +41,22 @@ module Teevee
         @options[:scan] = true
       end
 
+      def wit_token(token)
+        @options[:wit_token]
+      end
+
       # set the log level
       # 0 = only critical
       # 4 = prunings
       # 5 = item scans
       def log_level(int)
-        Teevee.log_level= int
+        Teevee.log_level = int
       end
 
       # pass through for configs
       # intended to be used from a scheduled thing
       def log(level, *texts)
-        Teevee.log(level, 'Config', *texts)
+        Teevee.log(level, 'config', *texts)
       end
 
       # turn on and configure the webui
@@ -107,7 +113,7 @@ module Teevee
         raise ConfigError, "No library defined." unless @root
         raise ConfigError, "No database connected." unless @finalized
 
-        puts "STARTING TEEVEED BOOT PROCESS"
+        Teevee.log 0, 'boot', 'STARTING TEEVEED'
         # lots of this code comes from the old teeveed.rb
         opts = @options
 
@@ -137,15 +143,16 @@ module Teevee
           exit 0
         end
 
-        puts "creating application"
+        Teevee.log 5, 'boot', 'creating application'
         app = Daemon.instance = Daemon::Application.new(@root, @indexer, opts)
 
         if opts[:scan]
-          puts "running scan"
+          Teevee.log 1, 'boot', 'running scan'
           app.indexer.scan(app.root.path)
         end
 
         if opts[:cli]
+          Teevee.log 1, 'boot', 'opening CLI'
           CLI.new(Daemon.instance).interact!
           exit 0
         end
@@ -159,6 +166,7 @@ module Teevee
 
         # --web - natural language interface via mobile web
         if opts[:web]
+          Teevee.log 1, 'boot', 'starting web remote'
           # start the webserver for the remote in a thread
           web = Thread.new do
             WebRemote.set :bind, opts[:ip]
@@ -171,6 +179,7 @@ module Teevee
         # --remote - remote debugging interface pry-remote
         if opts[:remote]
           # start pry-remote in a thread
+          Teevee.log 1, 'boot', 'starting ruby remote debugger'
           debug = Thread.new do
             while true do
               CLI.new(Daemon.instance).interact_remote!
