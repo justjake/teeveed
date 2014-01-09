@@ -3,9 +3,7 @@
 ###
 
 require 'rubygems'
-require 'bundler'
-Bundler.setup
-
+# no longer use Bundler - it fights with Java things
 
 # Teevee is a library for implementing media center daemons with natural language
 # user interfaces. NLI is based on Wit.ai.

@@ -29,9 +29,6 @@ end
 # read WIT_ACCESS_TOKEN from ENV
 opts[:wit_token] ||= ENV['WIT_ACCESS_TOKEN']
 
-require 'rubygems'
-require 'bundler/setup'
-
 # our software
 require 'teevee'
 require 'teevee/daemon'

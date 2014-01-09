@@ -1,4 +1,5 @@
 require 'active_support/core_ext/numeric/time'
+require 'rufus-scheduler'
 
 module Teevee
   module Daemon

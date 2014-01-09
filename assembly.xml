@@ -6,17 +6,24 @@
   </formats>
   <includeBaseDirectory>false</includeBaseDirectory>
   <fileSets>
+    <!-- bin and lib go into / -->
     <fileSet>
       <directory>${basedir}/bin</directory>
       <outputDirectory>/</outputDirectory>
     </fileSet>
     <fileSet>
+      <directory>${basedir}/lib</directory>
+      <outputDirectory>/</outputDirectory>
+    </fileSet>
+    <!-- as does the bootstrapper, which isnt in bin because it makes no sense for a rubygem -->
+    <fileSet>
       <directory>${basedir}/src/main/ruby</directory>
       <outputDirectory>/</outputDirectory>
     </fileSet>
     <fileSet>
+      <!-- rubygems contains a bin/ a gems/ etc -->
       <directory>${basedir}/target/rubygems</directory>
-      <outputDirectory>/gems</outputDirectory>
+      <outputDirectory>/</outputDirectory>
     </fileSet>
   </fileSets>
   <dependencySets>
@@ -29,6 +36,12 @@
           <exclude>META-INF/MANIFEST.MF</exclude>
         </excludes>
       </unpackOptions>
+
+      <!-- don't try to pack zipped gems from the bundler repo -->
+      <excludes>
+        <exclude>*:*:gem:*</exclude>
+      </excludes>
+
     </dependencySet>
   </dependencySets>
 </assembly>

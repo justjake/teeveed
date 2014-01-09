@@ -132,6 +132,14 @@
       <type>gem</type>
     </dependency>
 
+    <!-- for vlc-client -->
+    <dependency>
+      <groupId>rubygems</groupId>
+      <artifactId>retryable</artifactId>
+      <version>1.3.4</version>
+      <type>gem</type>
+    </dependency>
+
 
     <!-- Regular Dependencies -->
     <dependency>
