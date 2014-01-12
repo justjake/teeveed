@@ -42,7 +42,7 @@ module Teevee
       end
 
       def wit_token(token)
-        @options[:wit_token]
+        @options[:wit_token] = token
       end
 
       # set the log level
@@ -112,8 +112,8 @@ module Teevee
         opts = @options
 
         # guards
-        raise ConfigError, "No library defined." unless @root
-        raise ConfigError, "No database connected." unless @finalized
+        raise ConfigError, 'No library defined.' unless @root
+        raise ConfigError, 'No database connected.' unless @finalized
         if opts[:web] and not opts[:wit_token]
           Trollop::die :wit_token, 'the web ui requires a wit token'
         end
