@@ -148,7 +148,7 @@ module Teevee
         end
 
         Teevee.log 5, 'boot', 'creating application'
-        app = Daemon.instance = Daemon::Application.new(@root, @indexer, opts)
+        app = Daemon.instance = Teevee::Daemon::Application.new(@root, @indexer, opts)
 
         if opts[:scan]
           Teevee.log 1, 'boot', 'running scan'
@@ -194,6 +194,7 @@ module Teevee
 
         # wait for our server (forever)
         threads.each {|t| t.join}
+        exit 0
 
       end # boot!
 
