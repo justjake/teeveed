@@ -32,8 +32,10 @@ module Teevee
       attr_reader :type,        # sym
                   :confidence,  # float
                   :entities     # Hash<EntityType(Sym), Entity>
+                  :body         # string
 
-      def initialize(json_hash)
+      def initialize(json_hash, body)
+        @body = body
         @type = json_hash["intent"].to_sym
         @confidence = json_hash["confidence"]
         @entities = {}
@@ -51,7 +53,7 @@ module Teevee
 
       def initialize(json_hash)
         @body = json_hash["msg_body"]
-        @outcome = Intent.new(json_hash["outcome"])
+        @outcome = Intent.new(json_hash["outcome"], @body)
       end
     end
 

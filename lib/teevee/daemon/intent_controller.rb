@@ -12,6 +12,9 @@ module Teevee
     # the IntentController takes an intnet and carries out the actions needed
     # to bring it to fruition
     class IntentController
+      # pretty
+      DAIMOND = '♦'
+      RIGHT_ARROW = '→'
 
       def initialize(application)
         @app = application
@@ -31,9 +34,58 @@ module Teevee
       def handle_intent(intent)
         if self.respond_to? intent.type
           log 3, "Handling a #{intent.type.to_s} intent"
+
+          update_hud(intent) if @app.config[:hud]
+
           return self.send(intent.type, intent)
         end
         raise UnknownIntent, "Unknown intent: #{intent}" unless KNOWN_INTENTS.include? intent.type
+      end
+
+      # returns the sort of array-of-array-of-strings thing that HeadsUpDisplay.pushAlert takes
+      # as its second parameter for a given intent. Basically splits out all the entities
+      # and puts those in thier own words
+      def hud_annotated_intent(intent)
+        if (intent.entities || {}).keys.count > 0
+          res = []
+
+          entities = intent.entities.values.select{|ent| ent.start}
+            .sort{|a, b| a.start <=> b.start }
+
+          prev_end = 0
+          body = intent.body # this will be consumed
+          entities.each { |ent|
+            # non-entity prefix
+            res << [body[prev_end..ent.start].strip]
+            # entity body
+            res << [ent.body, 'entity']
+
+            prev_end = ent.end
+          }
+
+          return res
+        end
+
+        return [[intent.body]]
+      end
+
+      # update the hud to relect the scanned intent
+      # @param [Intent] intent the most recent user intent
+      def update_hud(intent)
+        HUD.with_hud do |hud|
+          if intent.type.nil?
+            styled_intent = [["#{DAIMOND} no intent detected"]]
+          else
+            styled_intent = [["#{DAIMOND} Intent:"], [intent.type.to_s.gsub(/_/, ' '), 'action']]
+            styled_intent << ["with #{intent.confidence}"] if intent.confidence < 0.7
+          end
+          body = hud_annotated_intent(intent)
+
+          hud.clearAlerts
+          hud.pushAlert(['small'], styled_intent)
+          hud.pushAlert(['large'], body)
+
+        end # end with_ud
       end
 
       def query_movie(intent)
