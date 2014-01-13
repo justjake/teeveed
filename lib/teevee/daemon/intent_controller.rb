@@ -47,7 +47,7 @@ module Teevee
 
       # print "Playing <X>" or "Playing 24 files starting with <X>"
       def hud_playing_files(files)
-        with_hud do |ui|
+        HUD.with_hud do |ui|
           if files.is_a? String
             ui.pushAlert(['small'], ['Playing'], [Pathname.new(files).basename.to_s, 'entity'])
           else
@@ -91,7 +91,8 @@ module Teevee
           if intent.type.nil?
             styled_intent = [["#{DAIMOND} no intent detected"]]
           else
-            styled_intent = [["#{DAIMOND} Intent:"], [intent.type.to_s.gsub(/_/, ' '), 'action']]
+            styled_intent = [["#{DAIMOND} Intent:"], [intent.type.to_s.gsub(/_/, ' '), 'intent']]
+            styled_intent << ["#{RIGHT_ARROW} #{intent.entities[:action]}", 'action'] if intent.entities[:actionn]
             styled_intent << ["with #{intent.confidence}"] if intent.confidence < 0.7
           end
           body = hud_annotated_intent(intent)
@@ -99,6 +100,7 @@ module Teevee
           hud.clearAlerts
           hud.pushAlert(['small'], *styled_intent)
           hud.pushAlert(['large'], *body)
+          hud.showHud
 
         end # end with_ud
       end

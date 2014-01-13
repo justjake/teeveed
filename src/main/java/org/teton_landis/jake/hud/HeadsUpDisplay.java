@@ -220,10 +220,6 @@ public class HeadsUpDisplay extends Application {
         primaryStage.setTitle("HUD");
         primaryStage.initStyle(StageStyle.TRANSPARENT);
         primaryStage.setScene(scene);
-
-        // for now......
-        pushExamples();
-        showHud();
     }
 
     public static void main(String[] args) {
