@@ -14,21 +14,11 @@ Text {
     -fx-fill: #ccc;
 }
 
-/* Text styles */
-.action, .result {
-    -fx-fill: #fff;
-}
-
-/*.user-input {*/
-    /*-fx-font-size: 75;*/
-/*}*/
-
-.entity, .entity Text {
+.action, .result, .intent, .entity, .entity Text {
     -fx-fill: #fff;
                            /* type, color, radius, spread, x, y */
     -fx-effect: dropshadow(gaussian, #999, 30, 0.1, 0, 0);
 }
-
 
 /* styling for our FlowPanes */
 .small {
