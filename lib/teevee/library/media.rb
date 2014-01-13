@@ -1,6 +1,7 @@
 # -*- encoding : utf-8 -*-
 require 'data_mapper'
 require 'active_support/core_ext/class/attribute'
+require 'pathname'
 
 require 'teevee/searchable'
 
@@ -102,6 +103,12 @@ module Teevee
 
         return self.new(data) if data
         return nil
+      end
+
+      # Returns the friendly name of a media file, for displaying in a UI
+      # @return [String] friendly name
+      def friendly_name
+        Pathname.new(self.relative_path).basename.to_s
       end
 
 

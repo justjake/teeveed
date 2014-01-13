@@ -13,12 +13,10 @@ module Teevee
     # the IntentController takes an intnet and carries out the actions needed
     # to bring it to fruition
     class IntentController
-      # pretty
-      DAIMOND = '♦'
-      RIGHT_ARROW = '→'
 
       def initialize(application)
         @app = application
+        @hud = HUD.new(@app.options[:hud])
       end
 
       # add wait-time while starting VLC server.
@@ -36,74 +34,24 @@ module Teevee
         if self.respond_to? intent.type
           log 3, "Handling a #{intent.type.to_s} intent"
 
-          update_hud(intent) if @app.options[:hud]
+          @hud.update do
+            @hud.clear_alerts!
+            @hud.push_intent!(intent)
+            @hud.show!
+          end
 
           res = self.send(intent.type, intent)
 
-          hud_playing_files(res)
-        end
-        raise UnknownIntent, "Unknown intent: #{intent}" unless KNOWN_INTENTS.include? intent.type
-      end
-
-      # print "Playing <X>" or "Playing 24 files starting with <X>"
-      def hud_playing_files(files)
-        HUD.with_hud do |ui|
-          if files.is_a? String
-            ui.pushAlert(['small'], ['Playing'], [Pathname.new(files).basename.to_s, 'entity'])
-          else
-            ui.pushAlert(['small'], ['Playing'], [files.length.to_s, 'entity'], ['starting with'],
-              [Pathname.new(files.first).basename.to_s, 'entity'])
+          @hud.update do
+            @hud.push_results!(res)
+            @hud.hide_in(30) # 30 seconds timeout
           end
-        end # end with_ui
-      end
-
-      # returns the sort of array-of-array-of-strings thing that HeadsUpDisplay.pushAlert takes
-      # as its second parameter for a given intent. Basically splits out all the entities
-      # and puts those in thier own words
-      def hud_annotated_intent(intent)
-        if (intent.entities || {}).keys.count > 0
-          res = []
-
-          entities = intent.entities.values.select{|ent| ent.start}
-            .sort{|a, b| a.start <=> b.start }
-
-          prev_end = 0
-          body = intent.body # this will be consumed
-          entities.each { |ent|
-            # non-entity prefix
-            res << [body[prev_end...ent.start].strip]
-            # entity body
-            res << [ent.body, 'entity']
-
-            prev_end = ent.end
-          }
 
           return res
         end
-
-        return [[intent.body]]
+        raise UnknownIntent, "Unknown intent: #{intent}"
       end
 
-      # update the hud to relect the scanned intent
-      # @param [Intent] intent the most recent user intent
-      def update_hud(intent)
-        HUD.with_hud do |hud|
-          if intent.type.nil?
-            styled_intent = [["#{DAIMOND} no intent detected"]]
-          else
-            styled_intent = [["#{DAIMOND} Intent:"], [intent.type.to_s.gsub(/_/, ' '), 'intent']]
-            styled_intent << ["#{RIGHT_ARROW} #{intent.entities[:action]}", 'action'] if intent.entities[:actionn]
-            styled_intent << ["with #{intent.confidence}"] if intent.confidence < 0.7
-          end
-          body = hud_annotated_intent(intent)
-
-          hud.clearAlerts
-          hud.pushAlert(['small'], *styled_intent)
-          hud.pushAlert(['large'], *body)
-          hud.showHud
-
-        end # end with_ud
-      end
 
       def query_movie(intent)
         # fuzzy matching stuff
@@ -179,15 +127,15 @@ module Teevee
             vlc.play
           end
 
-          return playlist
+          return season
         end
 
         Thread.new do
           vlc.connect
           vlc.play @app.root.abs_path(episode.relative_path)
         end
-        return @app.root.abs_path episode.relative_path
 
+        return episode
       end # query_episode
 
       def log(level, *things)
