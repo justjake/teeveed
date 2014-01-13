@@ -1,3 +1,4 @@
+# -*- encoding : utf-8 -*-
 module VLC
   # Manages a local VLC server in a child process
   class Server

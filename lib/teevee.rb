@@ -1,3 +1,4 @@
+# -*- encoding : utf-8 -*-
 ###
 # Teevee - a natural language interface show-starter
 ###

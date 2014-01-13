@@ -1,3 +1,4 @@
+# -*- encoding : utf-8 -*-
 # @private
 module Core
   module Ext

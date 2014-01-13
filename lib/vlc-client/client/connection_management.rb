@@ -1,3 +1,4 @@
+# -*- encoding : utf-8 -*-
 module VLC
   class Client
     module ConnectionManagement

@@ -1,3 +1,4 @@
+# -*- encoding : utf-8 -*-
 module Teevee
 
   # Manages indexing a library of media. Use {Root} to create a new

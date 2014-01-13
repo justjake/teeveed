@@ -1,3 +1,4 @@
+# -*- encoding : utf-8 -*-
 require 'retryable'
 
 require 'vlc-client/null_object'

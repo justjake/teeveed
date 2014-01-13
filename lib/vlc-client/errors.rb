@@ -1,3 +1,4 @@
+# -*- encoding : utf-8 -*-
 module VLC
   # Root error class
   class Error < StandardError; end

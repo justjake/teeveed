@@ -1,4 +1,6 @@
 #!/usr/bin/env ruby
+# -*- encoding : utf-8 -*-
+
 # teeveed - your media center daemon
 # https://github.com/justjake/teeveed
 # GNU GPLv3

@@ -1,3 +1,4 @@
+# -*- encoding : utf-8 -*-
 module Teevee
 
   # mixin. include to add Postgres full-text search support to a

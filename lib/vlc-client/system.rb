@@ -1,3 +1,4 @@
+# -*- encoding : utf-8 -*-
 module VLC
   # Local Client/Server VLC system
   class System

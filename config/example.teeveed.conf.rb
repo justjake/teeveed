@@ -1,3 +1,4 @@
+# -*- encoding : utf-8 -*-
 # Teeveed
 # Example config file.
 # place at ~/.teeveed.conf.rb

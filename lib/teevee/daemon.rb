@@ -1,3 +1,4 @@
+# -*- encoding : utf-8 -*-
 module Teevee
 
   # The daemon module uses the rest of the Teevee library to generate and respond
