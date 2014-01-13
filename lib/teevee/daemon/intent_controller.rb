@@ -38,9 +38,23 @@ module Teevee
 
           update_hud(intent) if @app.options[:hud]
 
-          return self.send(intent.type, intent)
+          res = self.send(intent.type, intent)
+
+          hud_playing_files(res)
         end
         raise UnknownIntent, "Unknown intent: #{intent}" unless KNOWN_INTENTS.include? intent.type
+      end
+
+      # print "Playing <X>" or "Playing 24 files starting with <X>"
+      def hud_playing_files(files)
+        with_hud do |ui|
+          if files.is_a? String
+            ui.pushAlert(['small'], ['Playing'], [Pathname.new(files).basename.to_s, 'entity'])
+          else
+            ui.pushAlert(['small'], ['Playing'], [files.length.to_s, 'entity'], ['starting with'],
+              [Pathname.new(files.first).basename.to_s, 'entity'])
+          end
+        end # end with_ui
       end
 
       # returns the sort of array-of-array-of-strings thing that HeadsUpDisplay.pushAlert takes
@@ -57,7 +71,7 @@ module Teevee
           body = intent.body # this will be consumed
           entities.each { |ent|
             # non-entity prefix
-            res << [body[prev_end..ent.start].strip]
+            res << [body[prev_end...ent.start].strip]
             # entity body
             res << [ent.body, 'entity']
 
@@ -104,7 +118,7 @@ module Teevee
           end
 
         end # end if
-        'No results found.'
+        nil
 
       end
 
@@ -140,7 +154,7 @@ module Teevee
         end
 
         if results.length == 0
-          return 'No results found.'
+          return nil
         end
 
         episode = results[0]
@@ -170,7 +184,7 @@ module Teevee
           vlc.connect
           vlc.play @app.root.abs_path(episode.relative_path)
         end
-        return episode
+        return @app.root.abs_path episode.relative_path
 
       end # query_episode
 
