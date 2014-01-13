@@ -37,6 +37,10 @@ module Teevee
         @options[:web] = true
       end
 
+      def enable_hud
+        @options[:hud] = true
+      end
+
       def scan_at_startup
         @options[:scan] = true
       end
@@ -190,6 +194,14 @@ module Teevee
             end
           end
           threads << debug
+        end
+
+        # --hud - show on-screen display
+        if opts[:hud]
+          hud = Thread.new do
+            Teevee::Daemon::HUD.start
+          end
+          threads << hud
         end
 
         # wait for our server (forever)

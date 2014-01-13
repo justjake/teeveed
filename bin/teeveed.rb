@@ -14,6 +14,8 @@ opts = Trollop::options do
   opt :ip, 'listening ip for the web ui'
   opt :port, 'listening port for the web ui'
 
+  opt :hud, 'enable on-screen user interface'
+
   opt :migrate, 'Destroy and re-create the database'
   opt :down, 'migrate down - undo migration #X', :type => :ints
   opt :up, 'migrate up - perform migrations #X', :type => :ints
