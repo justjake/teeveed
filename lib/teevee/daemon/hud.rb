@@ -125,8 +125,11 @@ module Teevee
           styled_intent = [["#{DAIMOND} no intent detected"]]
         else
           styled_intent = [["#{DAIMOND} Intent:"], [intent.type.to_s.gsub(/_/, ' '), 'intent']]
-          styled_intent << ["#{RIGHT_ARROW} #{intent.entities[:action]}", 'action'] if intent.entities[:actionn]
-          styled_intent << ["with #{intent.confidence}"] if intent.confidence < 0.7
+          if intent.entities[:action]
+            styled_intent << [RIGHT_ARROW]
+            styled_intent << [intent.entities[:action].value, 'action']
+          end
+          styled_intent << ["with #{intent.confidence} confidence"] if intent.confidence < 0.7
         end
         body = _intent_to_alert(intent)
 
