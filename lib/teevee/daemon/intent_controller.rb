@@ -36,7 +36,7 @@ module Teevee
         if self.respond_to? intent.type
           log 3, "Handling a #{intent.type.to_s} intent"
 
-          update_hud(intent) if @app.config[:hud]
+          update_hud(intent) if @app.options[:hud]
 
           return self.send(intent.type, intent)
         end
@@ -83,8 +83,8 @@ module Teevee
           body = hud_annotated_intent(intent)
 
           hud.clearAlerts
-          hud.pushAlert(['small'], styled_intent)
-          hud.pushAlert(['large'], body)
+          hud.pushAlert(['small'], *styled_intent)
+          hud.pushAlert(['large'], *body)
 
         end # end with_ud
       end

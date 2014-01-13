@@ -19,7 +19,7 @@ module Teevee
 
       # grabs the latest instance of HeadsUpDisplay.
       # @return [org.teton_landis.jake.hud.HeadsUpDisplay, Nil]
-      def self.instance
+      def self.java_instance
         AppClass.instance
       end
 
@@ -32,11 +32,12 @@ module Teevee
       # Perform an action on the JavaFX application thread.
       # @yieldparam [org.teton_landis.jake.hud.HeadsUpDisplay] hud current HUD instance
       def self.with_hud(&block)
-        hud = instance()
+        hud = java_instance
         # Proc.new not strictly required, but helps solve IDEA worries
-        Platform.runLater Proc.new do
+        (Platform.runLater do
           block.call(hud)
-        end
+        end)
+
       end
     end
   end

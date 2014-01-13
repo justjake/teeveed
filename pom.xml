@@ -4,7 +4,7 @@
 
   <groupId>org.teton_landis.jake.teeveed</groupId>
   <artifactId>teeveed</artifactId>
-  <version>0.1.1</version>
+  <version>0.1.2</version>
   <packaging>jar</packaging>
 
   <name>teeveed</name>
@@ -21,6 +21,10 @@
   </repositories>
 
   <build>
+
+  <defaultGoal>package</defaultGoal>
+  <sourceDirectory>src/main/java</sourceDirectory>
+
     <plugins>
       <!-- install rubygems into target/rubygems -->
       <plugin>

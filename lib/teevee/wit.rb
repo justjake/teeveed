@@ -32,7 +32,7 @@ module Teevee
     class Intent
       attr_reader :type,        # sym
                   :confidence,  # float
-                  :entities     # Hash<EntityType(Sym), Entity>
+                  :entities,    # Hash<EntityType(Sym), Entity>
                   :body         # string
 
       def initialize(json_hash, body)

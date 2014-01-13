@@ -27,6 +27,17 @@ module Teevee
         app.scheduler
       end
 
+      def launch_ui
+        Thread.new do
+          puts 'Launching UI in slave thread'
+          Daemon::HUD.start
+        end
+      end
+
+      def gen_intent_controller
+        Daemon::IntentController.new(app)
+      end
+
       attr_accessor :store
 
       def initialize(app)
