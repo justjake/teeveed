@@ -6,6 +6,25 @@ My winter break project (12/28/13 - 1/10/14) by [@jitl](https://twitter.com/@jit
 
 ## Development
 
+#### Current Tasks
+
+1.  Switching from `DataMapper` to `Sequel` for our ruby-hipster ORM.
+    DataMapper does too much work that keeps us from raw SQL, which
+    we need to implement trigram-based text matching
+
+2.  Use the JavaFX entry point. Right now teeveed boots from
+    `jar-bootstrap.rb` via JRuby's `org.jruby.JarBootstrapMain`.
+    We need to use a JavaFX main to use JavaFX bundling tools
+    and eliminate dependence on
+    `mvn com.zenjava:javafx-maven-plugin:2.0:fix-classpath`
+    for deployment
+
+3.  Switch from JRuby-based JIT compiling to AOT compiling.
+    teeveed boots really, really slowley, and that's because
+    there's a lot of JIT happening when the jar is loaded.
+    Maybe things would go faster if we pre-compiled teeveed
+    (and its gems).
+
 #### Requirements
 
 - Java JDK 1.7
