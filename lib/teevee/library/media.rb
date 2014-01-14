@@ -5,6 +5,9 @@ require 'pathname'
 
 require 'teevee/searchable'
 
+# Use 255-char long strings by default
+DataMapper::Property::String.length(0..255)
+
 module Teevee
   module Library
 
@@ -29,8 +32,7 @@ module Teevee
 
       # path of the media resource from the library root
       property :relative_path,  String, :unique_index => true,
-                                        :required => true,
-                                        :length => (1..255)
+                                        :required => true
 
       # used for pruning old things from the index:
       # 1. started = Time.now
@@ -39,9 +41,14 @@ module Teevee
       property :last_seen,      DateTime, :default => proc {Library.rough_time}
 
 
+
       ### Full Text Search ####################################################
       include Teevee::Searchable
       self.search_indexes =  [:relative_path]
+
+
+
+      ### Teevee Indexing #####################################################
 
       # suffixes are replaced by this value before the regex is run
       # you should use #{SUFIX} in your REGEX to denote the end.

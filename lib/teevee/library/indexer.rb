@@ -47,7 +47,7 @@ module Teevee
               in_db.last_seen = DateTime.now
               updated << in_db
               if not in_db.save
-                throw "Database save error: #{in_db}.save failed"
+                raise "Database save error: #{in_db.inspect}.save failed"
               end
 
             # new file, just add it to the DB!
@@ -55,7 +55,7 @@ module Teevee
               log 5, "\tNEW: #{file.relative_path} new, saving for first time."
               created << file
               if not file.save
-                throw "Database save error: #{file}.save failed"
+                raise "Database save error: #{file.inspect}.save failed"
               end
             end
           end
