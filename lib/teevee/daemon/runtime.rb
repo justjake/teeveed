@@ -199,6 +199,7 @@ module Teevee
 
         # --hud - show on-screen display
         if opts[:hud]
+          require 'teevee/daemon/hud'
           hud = Thread.new do
             Teevee::Daemon::HUD.start
           end

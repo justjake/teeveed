@@ -15,9 +15,6 @@ module Teevee
       HeadsUpDisplay = org.teton_landis.jake.hud.HeadsUpDisplay
       Platform = javafx.application.Platform
 
-      raise LoadError, "Couldn't load org.teton_landis.jake.hud.HeadsUpDisplay" if HeadsUpDisplay.nil?
-      raise LoadError, "Couldn't load javafx.application.Platform" if Platform.nil?
-
       HIDES_MUTEX = Mutex.new
       PENDING_HIDES = []
 
