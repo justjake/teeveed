@@ -86,6 +86,7 @@ public class HeadsUpDisplay extends Application {
         show_transition.setFromValue(root.getOpacity());
 
         mainStage.show();
+        mainStage.toFront();
         show_transition.play();
     }
 
