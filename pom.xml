@@ -4,7 +4,7 @@
 
   <groupId>org.teton_landis.jake.teeveed</groupId>
   <artifactId>teeveed</artifactId>
-  <version>0.2.1-SNAPSHOT</version>
+  <version>0.2.1</version>
   <packaging>jar</packaging>
 
   <name>teeveed</name>
@@ -73,13 +73,6 @@
 
   <dependencies>
     <!-- GEMS -->
-    <dependency>
-      <groupId>rubygems</groupId>
-      <artifactId>bundler</artifactId>
-      <version>1.5.1</version>
-      <type>gem</type>
-    </dependency>
-
     <dependency>
       <groupId>rubygems</groupId>
       <artifactId>activesupport</artifactId>
