@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+# wrapper script to run the teeveed daemon
+
+TEEVEED_HOME="$HOME/teeveed"
+JAR="$TEEVEED_HOME/teeveed-0.2.1-SNAPSHOT.jar"
+LOG="$TEEVEED_HOME/log"
+echo -e "\n== teevee wrapper script -- $(date)" >> "$LOG"
+
+exec java -cp "$JAR" -jar "$JAR" --config "$TEEVEED_HOME/indexer.conf.rb" "$@" 2>&1 | tee -a "$TEEVEED_HOME/log"
