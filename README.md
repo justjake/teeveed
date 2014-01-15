@@ -1,8 +1,20 @@
-# teeveed
+
+# ![teeveed icon](http://justjake.github.io/teeveed/images/teeveed-256.png)
 
 natural language daemon for the media center.
 
 My winter break project (12/28/13 - 1/10/14) by [@jitl](https://twitter.com/@jitl)
+
+## What it does
+
+**teeveed** is a media center daeon you control with your voice. Right now, you talk to it with your smartphone's
+web browser. You tell teeveed to play a movie or an episode of a show you want to see that you have on your share, and it
+opens VLC for you.
+
+Behind the scenes, teeveed runs an indexer to keep finding files fast. It runs a webserver so you can communicate with it, and it
+has a nice pleasent heads-up display, so you can see what it's doing.
+
+![screenshot of the HUD](http://justjake.github.io/teeveed/images/hud.png)
 
 ## Development
 
