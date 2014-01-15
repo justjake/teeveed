@@ -3,7 +3,8 @@ export PROJECT_ROOT="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 # export WIT_ACCESS_TOKEN="!token goes here!"
 
-export RUBYLIB="$PROJECT_ROOT/lib"
+export CLASSPATH="$PROJECT_ROOT/target/classes"
+export RUBYLIB="$PROJECT_ROOT/lib:$CLASSPATH"
 export GEM_HOME="$PROJECT_ROOT/target/rubygems"
 export PATH="$GEM_HOME/bin:$PATH"
 
