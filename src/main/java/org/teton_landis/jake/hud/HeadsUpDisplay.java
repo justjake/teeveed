@@ -8,6 +8,7 @@ import javafx.event.EventHandler;
 import javafx.geometry.*;
 import javafx.scene.Node;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
@@ -21,7 +22,7 @@ public class HeadsUpDisplay extends Application {
     static final double fontSize = 70;
     static final double totalWidth = 1200;
     static final double sixteenNine = (9.0 / 16.0);
-    static final Duration FadeTime = Duration.millis(1300);
+    static final Duration FadeTime = Duration.millis(800);
 
     static public HeadsUpDisplay instance; // tricky global state !!!!
 
@@ -218,6 +219,7 @@ public class HeadsUpDisplay extends Application {
         });
 
         // stage setup
+        primaryStage.getIcons().add(new Image(this.getClass().getResourceAsStream("/teeveed-256.png")));
         primaryStage.setTitle("HUD");
         primaryStage.initStyle(StageStyle.TRANSPARENT);
         primaryStage.setScene(scene);
