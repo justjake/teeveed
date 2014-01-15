@@ -35,43 +35,40 @@ module Teevee
         created = []
         updated = []
 
-        # add/update transaction
-        Media.transaction do
-          items.each do |file|
+        items.each do |file|
+          Media.db.transaction do
             log 5, "checking file #{file.relative_path}"
-            in_db = Media.first(:relative_path => file.relative_path)
+            in_db = Media.find(:relative_path => file.relative_path)
 
             # already indexed once, just update the date and save it
             if in_db
               log 5, "\tOLD: #{file.relative_path} already in index, updating :last_seen"
-              in_db.last_seen = DateTime.now
+              in_db.last_seen = Teevee::Library.rough_time
               updated << in_db
-              if not in_db.save
-                raise "Database save error: #{in_db.inspect}.save failed"
-              end
+              in_db.save
 
             # new file, just add it to the DB!
             else
               log 5, "\tNEW: #{file.relative_path} new, saving for first time."
               created << file
-              if not file.save
-                raise "Database save error: #{file.inspect}.save failed"
-              end
+              file.save
             end
           end
         end
 
         # old items
-        in_scan = Media.all(:relative_path.like => root.relative_path(full_path)+'%')
-        log 5, "pruning: found #{in_scan.length} files under scan path in the index"
-        stale = in_scan.all(:last_seen.lt => start_time)
-        log 4, "pruning: found #{stale.length} stale files"
+        in_scan = Media.where(:relative_path.like(root.relative_path(full_path) + '%'))
+        log 5, "pruning: found #{in_scan.count} files under scan path in the index"
+        stale = in_scan.where{last_seen < start_time}
+        log 4, "pruning: found #{stale.count} stale files"
+
         deleted = stale.to_a
+        # .delete is faster, but may not honor triggers:
+        # see http://sequel.jeremyevans.net/rdoc/classes/Sequel/Model/DatasetMethods.html
+        # we don't use any triggers right now!
+        stale.destroy
 
-        Media.transaction do
-          stale.destroy
-        end
-
+        log 3, "scan finished: #{created.length} new, #{updated.length} old, #{deleted.length} deleted"
         ScanResults.new(created, updated, deleted)
       end
 
