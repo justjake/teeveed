@@ -4,7 +4,7 @@
 
   <groupId>org.teton_landis.jake.teeveed</groupId>
   <artifactId>teeveed</artifactId>
-  <version>0.2.2</version>
+  <version>0.3.0-SNAPSHOT-sequel</version>
   <packaging>jar</packaging>
 
   <name>teeveed</name>
@@ -82,18 +82,27 @@
 
     <dependency>
       <groupId>rubygems</groupId>
-      <artifactId>data_mapper</artifactId>
-      <version>1.2.0</version>
+      <artifactId>rufus-scheduler</artifactId>
+      <version>3.0.3</version>
+      <type>gem</type>
+    </dependency>
+
+    <!-- database -->
+    <dependency>
+      <groupId>rubygems</groupId>
+      <artifactId>sequel</artifactId>
+      <version>4.6.0</version>
       <type>gem</type>
     </dependency>
 
     <dependency>
       <groupId>rubygems</groupId>
-      <artifactId>dm-postgres-adapter</artifactId>
-      <version>1.2.0</version>
+      <artifactId>jdbc-postgres</artifactId>
+      <version>9.3.1100</version>
       <type>gem</type>
     </dependency>
 
+    <!-- web APIs and stuff -->
     <dependency>
       <groupId>rubygems</groupId>
       <artifactId>faraday</artifactId>
@@ -101,6 +110,7 @@
       <type>gem</type>
     </dependency>
 
+    <!-- webapps -->
     <dependency>
       <groupId>rubygems</groupId>
       <artifactId>haml</artifactId>
@@ -110,22 +120,16 @@
 
     <dependency>
       <groupId>rubygems</groupId>
-      <artifactId>pry-remote</artifactId>
-      <version>0.1.7</version>
-      <type>gem</type>
-    </dependency>
-
-    <dependency>
-      <groupId>rubygems</groupId>
-      <artifactId>rufus-scheduler</artifactId>
-      <version>3.0.3</version>
-      <type>gem</type>
-    </dependency>
-
-    <dependency>
-      <groupId>rubygems</groupId>
       <artifactId>sinatra</artifactId>
       <version>1.4.4</version>
+      <type>gem</type>
+    </dependency>
+
+    <!-- debugging -->
+    <dependency>
+      <groupId>rubygems</groupId>
+      <artifactId>pry-remote</artifactId>
+      <version>0.1.7</version>
       <type>gem</type>
     </dependency>
 
