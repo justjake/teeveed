@@ -28,8 +28,3 @@ end
 
 # NLP api
 require 'teevee/wit'
-
-# indexed library
-require 'teevee/searchable'
-require 'teevee/library'
-require 'teevee/migrations'
