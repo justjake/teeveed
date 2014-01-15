@@ -1,76 +1,59 @@
 # -*- encoding : utf-8 -*-
 module Teevee
 
-  # mixin. include to add Postgres full-text search support to a
-  # DataMapper resource
-  # from https://gist.github.com/BrianTheCoder/217158
+  # Sequel model plugin. include to add Postgres full-text search support to a
+  # model plugin spec: http://sequel.jeremyevans.net/rdoc/files/doc/model_plugins_rdoc.html
   # TODO add postgres trigram support, see http://bartlettpublishing.com/site/bartpub/blog/3/entry/350
+  # TODO dataset methods
   module Searchable
     # run when `include Database::Searchable`
-    def self.included(by_class)
-      by_class.extend(ClassMethods)
-      by_class.instance_eval do
-        class_attribute(:search_indexes)
-        self.search_indexes = []
-      end
-    end # included
 
-    module ClassMethods
-
-      # all classes that inherit from this class, directly or indirectly
-      def descendants
-        ObjectSpace.each_object(Class).select{|k| k < self}
+    module DatasetMethods
+      # match a column based on trigram similarity, and order by descending similarity
+      # @param column [Symbol] column to match agains
+      # @param search [String] search text
+      # @param threshold [Float] only results more similar than the threshold will be returned
+      def similar(column, search, threshold = 0.3)
+        similarity = Sequel.function(:similarity, column, search)
+        self.where(similarity > threshold).order_append(similarity.desc)
       end
 
-      # crawl up the parent tree and get all the unique
-      # search indexes
-      def all_search_indexes
-        # furthest parent with search indexes
-        ancestor = self.ancestors.reverse.find{|a| a.respond_to? :search_indexes}
-
-        # all classes that may define search indexes in this table
-        classes = [ancestor] + ancestor.descendants
-
-        # all the properties with search indexes in this table
-        classes.map{|c| c.search_indexes}.flatten.uniq
-      end
-
-      def search_all(query, options = {})
-        search(query, options.merge(:search_indexes => all_search_indexes))
+      # match a column based on trigram similarity, and order by descending similarity
+      # an OR method instead of an AND
+      # @param column [Symbol] column to match agains
+      # @param search [String] search text
+      # @param threshold [Float] only results more similar than the threshold will be returned
+      def or_similar(column, search, threshold = 0.3)
+        similarity = Sequel.function(:similarity, column, search)
+        self.or(similarity > threshold).order_append(similarity.desc)
       end
 
       # perform a full text search
-      # @param [String] query     the search terms
-      # @param [Hash] options
-      # @param [Array<Symbol>] options[:search_indexes] which fields to search
-      def search(query, options = {})
-        given_search_indexes = options.delete(:search_indexes) || all_search_indexes
-        conds = given_search_indexes.map do |index|
-          "#{index}_search_index @@ plainto_tsquery(?)"
-        end
-        conds_array = [conds.join(' OR ')]
-        given_search_indexes.size.times { conds_array << escape_string(query) }
-        all(options.merge(:conditions => conds_array))
+      # @param [Symbol] column   column to search. Must have an index column column_search_index.
+      # @param [String] search   the search terms
+      def text_match(column, search)
+        column = "#{column.to_s}_search_index".to_sym
+        self.where(':column @@ plainto_tsquery(:search)', :column => column, :search => search)
+          .order_append(Sequel.function(:ts_rank, column, Sequel.function(:plainto_tsquery, search)).desc)
       end
 
-      private
+      # perform a full text search
+      # an OR method instead of an AND
+      # @param [Symbol] column   column to search. Must have an index column column_search_index.
+      # @param [String] search   the search terms
+      def or_text_match(column, search)
+        column = "#{column.to_s}_search_index".to_sym
+        self.or(':column @@ plainto_tsquery(:search)', :column => column, :search => search)
+          .order_append(Sequel.function(:ts_rank, column, Sequel.function(:plainto_tsquery, search)).desc)
+      end
+    end # DatasetMethods
 
-      # escape a string for postgres
-      # TODO: replace with DataMapper's DataObject adapeter's escape method
-      def escape_string(str)
-        str.gsub(/([\0\n\r\032\'\"\\])/) do
-          case $1
-            when "\0" then "\\0"
-            when "\n" then "\\n"
-            when "\r" then "\\r"
-            when "\032" then "\\Z"
-            when "'" then "''"
-            else "\\"+$1
-          end
-        end
-      end # escape_string
-
+    module ClassMethods
+      [:similar, :or_similar, :text_match, :or_text_match].each do |meth|
+        Sequel::Plugins.def_dataset_methods(self, meth)
+      end
     end # ClassMethods
+
   end # Searchable
 
 end # Teevee
