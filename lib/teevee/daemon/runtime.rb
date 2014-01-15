@@ -2,6 +2,9 @@
 require 'active_support/core_ext/numeric/time'
 require 'rufus-scheduler'
 
+require 'sequel'
+Sequel.extension :core_extensions
+
 module Teevee
   module Daemon
     # a scope for performing configuration
@@ -71,9 +74,14 @@ module Teevee
       end
 
       # connect the database
+      # database connection in the form of a JDBC connection string
+      # see http://jdbc.postgresql.org/documentation/80/connect.html
       def database(uri)
-        DataMapper.setup(:default, uri)
+        Sequel.connect(uri)
         @finalized = true
+
+        # now that that database has been loaded, we can require the Library
+        require 'teevee/library/media'
       end
 
       # define the library
@@ -124,30 +132,16 @@ module Teevee
         end
 
         Teevee.log 0, 'boot', 'STARTING TEEVEED'
-        # lots of this code comes from the old teeveed.rb
 
-        # finish this puppy up
-        DataMapper.finalize
+        ### Tools ###################################################
 
-        # perform migrations and exit
+        # --migrate - perform migrations and exit
         if opts[:migrate]
-          DataMapper::Logger.new(STDOUT, :debug)
-          DataMapper.logger.debug( "Starting migrations, up: #{opts[:up]}, down: #{opts[:down]}" )
+          # load extension for Sequel::Migrator
+          Sequel.extension :migration
+          Teevee.log 1, 'migrations', "Running migrations in #{opts[:migrate]} to:#{opts[:to]}, from:#{opts[:from]}"
 
-          # we aren't using transactions in the migrations, so.... do this instead when things
-          # blow up and state gets messy :(
-          # TODO switch migrations to transactions
-          if opts[:trash]
-            adapter = DataMapper.repository(@repository).adapter
-            adapter.execute('DROP TABLE migration_info;')
-          end
-
-          migrations = Teevee::Migrations::generate(Teevee::Library::Media)
-          ups = migrations.select{|m| opts[:up].include? m.position }
-          downs = migrations.select{|m| opts[:down].include? m.position }
-
-          downs.reverse.each {|m| m.perform_down}
-          ups.each {|m| m.perform_up}
+          Sequel::Migrator.apply(Sequel::DATABASES[0], opts[:migrate], opts[:to], opts[:from])
 
           exit 0
         end
@@ -155,16 +149,21 @@ module Teevee
         Teevee.log 5, 'boot', 'creating application'
         app = Daemon.instance = Teevee::Daemon::Application.new(@root, @indexer, opts)
 
+        # --scan or scan_at_startup
         if opts[:scan]
           Teevee.log 1, 'boot', 'running scan'
           app.indexer.scan(app.root.path)
         end
 
+        # --cli
         if opts[:cli]
           Teevee.log 1, 'boot', 'opening CLI'
           CLI.new(Daemon.instance).interact!
           exit 0
         end
+
+
+        ### Daemon ##################################################
 
         threads = []
 
@@ -206,8 +205,11 @@ module Teevee
           threads << hud
         end
 
+        Teevee.log 1, 'boot', 'daemon started successfully.'
+
         # wait for our server (forever)
         threads.each {|t| t.join}
+        Teevee.log 1, 'exit', 'shutting down.'
         exit 0
 
       end # boot!
