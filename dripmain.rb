@@ -3,5 +3,5 @@
 # JVM instance ready to run the app with minimal startup time
 # see drip.env.sh
 
-require 'bundler/setup'
-Bundler.require
+require 'teevee'
+require 'teevee/daemon'
