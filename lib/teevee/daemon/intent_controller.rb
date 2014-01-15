@@ -55,68 +55,84 @@ module Teevee
 
       def query_movie(intent)
         # fuzzy matching stuff
+
+        movies = Teevee::Library::Movie.dataset
+
+        # filter on year
+        if intent.entities.include? :year
+          year = intent.entities[:title].value.to_i
+          movies = movies.where(:year => year)
+        end
+
+        # filter on title
         if intent.entities.include? :title
-          movies = Teevee::Library::Movie.search(intent.entities[:title].value, :search_indexes => [:title])
-          log 4, "found #{movies.length} title=#{intent.entities[:title].value}"
-
-          if movies.length > 0
-            Thread.new do
-              vlc.connect
-              vlc.play @app.root.abs_path(movies[0].relative_path)
-            end
-            return movies[0]
-          end
-
+          title = intent.entities[:title].value
+          movies = movies.similar(:title, title)
+          log 4, "found #{movies.count} title=#{title}"
         end # end if
-        nil
 
+        # success!
+        if movies.count > 0
+          Thread.new do
+            vlc.connect
+            vlc.play @app.root.abs_path(movies.first.relative_path)
+          end
+          return movies.first
+        end
+
+        # failure :(
+        nil
       end
 
       def query_episode(intent)
         # build query from definite paramters
+        # maps from wit_entity_name to database_column
         name_mapping = {
             :season => :season,
             :episode => :episode_num,
         }
 
-        query = {
-            :order => [:season.asc, :episode_num.asc]
-        }
+        query = {}
         name_mapping.each do |wit, db|
           if intent.entities.include? wit
             query[db] = intent.entities[wit].value
           end
         end
 
-        results = Teevee::Library::Episode.all(query)
+        # filter on hard facts first
+        results = Teevee::Library::Episode.where(query)
 
         # fuzzy matching stuff
-        if intent.entities.include? :title
-          episodes = results.search(intent.entities[:title].value, :search_indexes => [:show])
-          log 4, "found #{episodes.length} show=#{intent.entities[:title].value}"
-          results = episodes if episodes.length > 0
+        if intent.entities.include? :title # wit: title --> db: show
+          # episodes = results.search(intent.entities[:title].value, :search_indexes => [:show])
+          show_name = intent.entities[:title].value
+          episodes = results.similar(:show, show_name)
+          log 4, "found #{episodes.count} show=#{show_name}"
+          results = episodes
         end
 
         if intent.entities.include? :episode_name
-          episodes = results.search(intent.entities[:episode_name].value, :search_indexes => [:title])
-          log 4, "found #{episodes.length} title=#{intent.entities[:episode_name].value}"
-          results = episodes if episodes.length > 0
+          episode_name = intent.entities[:episode_name].value
+          # episodes = results.search(intent.entities[:episode_name].value, :search_indexes => [:title])
+          episodes = results.similar(:title, episode_name)
+          log 4, "found #{episodes.count} title=#{episode_name}"
+          results = episodes
         end
 
-        if results.length == 0
+        # failure
+        if results.count == 0
           return nil
         end
 
-        episode = results[0]
+        episode = results.first
 
-        if episode.attributes.include? :season and episode.attributes.include? :episode_num
-          # we have a well-frormatted episode on our hands
+        if episode.season and episode.episode_num
+          # we have a well-formatted episode (with season data) on our hands
           # build a playlist of the following episodes in the season
-          season = Teevee::Library::Episode.all(
-            :season => episode.season,
-            :episode_num.gte => episode.episode_num,
-            :order => [:episode_num.asc]
-          ).to_a
+          season = Teevee::Library::Episode.where(
+              :show => episode.show,
+              :season => episode.season,
+          ).where{episode_num > episode.episode_num} .order(:episode_num).to_a
 
           playlist = season.map{ |f| @app.root.abs_path f.relative_path }
 
@@ -128,14 +144,14 @@ module Teevee
           end
 
           return season
-        end
+        end # end could get season
 
         Thread.new do
           vlc.connect
           vlc.play @app.root.abs_path(episode.relative_path)
         end
 
-        return episode
+        episode
       end # query_episode
 
       def log(level, *things)
