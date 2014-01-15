@@ -31,149 +31,155 @@
 
       <section>
         <div id="title">
-          <h1>teeveed</h1>
-          <p>Natural language interface for your media center</p>
+          <p>
+              <img src="./images/teeveed-256.png" alt="teeveed icon" /><br />
+              </p>
+          <h1 style="display: none;">
+              teeveed
+          </h1>
+          <p><strong>teeveed</strong>: natural language interface for your media center</p>
           <hr>
-          <span class="credits left">Project maintained by <a href="https://github.com/justjake">justjake</a></span>
+          <span class="credits left">a winter break project by <a href="https://github.com/justjake">justjake</a> - <a href="https://twitter.com/@jit">@jitl</a></span>
           <span class="credits right">Hosted on GitHub Pages &mdash; Theme by <a href="https://twitter.com/michigangraham">mattgraham</a></span>
-        </div>
+      </div> <!-- end title -->
 
-        <h1>
-<a name="teeveed" class="anchor" href="#teeveed"><span class="octicon octicon-link"></span></a>teeveed</h1>
+        <h2>
+            <a name="does" class="anchor" href="#does"><span class="octicon octicon-link"></span></a>What It Does</h2>
+        <p>
+        <strong>teeveed</strong> is a media center daeon you control with your voice. Right now, you talk to it with your smartphone's
+        web browser. You tell teeveed to play a movie or an episode of a show you want to see that you have on your share, and it
+        opens VLC for you.</p>
+        <p>Behind the scenes, teeveed runs an indexer to keep finding files fast. It runs a webserver so you can communicate with it, and it
+        has a nice pleasent heads-up display, so you can see what it's doing.</p>
+        <p>
+        <img src="./images/hud.png" title="screenshot of the hud" style="border: 3px solid #ccc"/>
+        </p>
+        <h2>
+            <a name="development" class="anchor" href="#development"><span class="octicon octicon-link"></span></a>Development</h2>
 
-<p>natural language daemon for the media center.</p>
+        <h4>
+            <a name="current-tasks" class="anchor" href="#current-tasks"><span class="octicon octicon-link"></span></a>Current Tasks</h4>
 
-<p>A winter break project (12/28/13 - 1/10/14) by <a href="https://twitter.com/@jitl">@jitl</a></p>
+        <ol>
+            <li><p>Use the JavaFX entry point. Right now teeveed boots from
+            <code>jar-bootstrap.rb</code> via JRuby's <code>org.jruby.JarBootstrapMain</code>.
+            We need to use a JavaFX main to use JavaFX bundling tools
+            and eliminate dependence on
+            <code>mvn com.zenjava:javafx-maven-plugin:2.0:fix-classpath</code>
+            for deployment</p></li>
+            <li><p>Switch from JRuby-based JIT compiling to AOT compiling.
+            teeveed boots really, really slowley, and that's because
+            there's a lot of JIT happening when the jar is loaded.
+            Maybe things would go faster if we pre-compiled teeveed
+            (and its gems).</p></li>
+        </ol><h4>
+            <a name="requirements" class="anchor" href="#requirements"><span class="octicon octicon-link"></span></a>Requirements</h4>
 
-<h2>
-<a name="development" class="anchor" href="#development"><span class="octicon octicon-link"></span></a>Development</h2>
+        <ul>
+            <li>Java JDK 1.7</li>
+            <li>Maven 2+</li>
+            <li>JRuby 1.7.x</li>
+            <li>PostgreSQL 9.1+ <em>with</em> the <code>pg_trgm</code> extension! <strong>pg_trgm</strong> is one
+            of the ways we find similar-text matches</li>
+        </ul><p>teeveed uses <a href="https://github.com/torquebox/jruby-maven-plugins#installing-gems-into-you-project-directory">gem-maven-plugin</a> instead of <code>Bundler</code> to manage
+        requirements. See <code>pom.xml</code> for more information.</p>
 
-<h4>
-<a name="current-tasks" class="anchor" href="#current-tasks"><span class="octicon octicon-link"></span></a>Current Tasks</h4>
+        <h4>
+            <a name="get-hacking" class="anchor" href="#get-hacking"><span class="octicon octicon-link"></span></a>Get Hacking</h4>
 
-<ol>
-<li><p>Switching from <code>DataMapper</code> to <code>Sequel</code> for our ruby-hipster ORM.
-DataMapper does too much work that keeps us from raw SQL, which
-we need to implement trigram-based text matching</p></li>
-<li><p>Use the JavaFX entry point. Right now teeveed boots from
-<code>jar-bootstrap.rb</code> via JRuby's <code>org.jruby.JarBootstrapMain</code>.
-We need to use a JavaFX main to use JavaFX bundling tools
-and eliminate dependence on
-<code>mvn com.zenjava:javafx-maven-plugin:2.0:fix-classpath</code>
-for deployment</p></li>
-<li><p>Switch from JRuby-based JIT compiling to AOT compiling.
-teeveed boots really, really slowley, and that's because
-there's a lot of JIT happening when the jar is loaded.
-Maybe things would go faster if we pre-compiled teeveed
-(and its gems).</p></li>
-</ol><h4>
-<a name="requirements" class="anchor" href="#requirements"><span class="octicon octicon-link"></span></a>Requirements</h4>
+        <ol>
+            <li>
+            <code>git clone https://github.com/justjake/teeveed</code> or similar to get the source</li>
+            <li>
+            <code>cd teeveed</code>, <code>mvn initialize</code> will download and install the required rubygems
+            in <code>teeveed/target/rubygems</code>
+            </li>
+            <li>
+            <code>source env.sh</code> will correct your <code>$GEM_HOME</code> and <code>$RUBY_LIB</code> environment variables
+            to point to the gems installed in <code>teeveed/target/rubygems</code> and the teeveed sources.</li>
+            <li>Hack away. run <code>teeveed</code> (alias provided by env.sh) to start the daemon, or
+            <code>cli</code> to start the Pry command line.</li>
+        </ol><p>If things feel too slow,
+        You should get <a href="https://github.com/flatland/drip">drip</a> in your ~/bin,
+        and then <code>source drip.env.sh</code> before launching any of this ruby junk.
+        Drip'll put the spring back in your step!</p>
 
-<ul>
-<li>Java JDK 1.7</li>
-<li>Maven 2+</li>
-<li>JRuby 1.7.x</li>
-<li>PostgreSQL 9.1+ <em>with</em> the <code>pg_trgm</code> extension! <strong>pg_trgm</strong> is one
-of the ways we find similar-text matches</li>
-</ul><p>teeveed uses <a href="https://github.com/torquebox/jruby-maven-plugins#installing-gems-into-you-project-directory">gem-maven-plugin</a> instead of <code>Bundler</code> to manage
-requirements. See <code>pom.xml</code> for more information.</p>
+        <h2>
+            <a name="installation" class="anchor" href="#installation"><span class="octicon octicon-link"></span></a>Installation</h2>
 
-<h4>
-<a name="get-hacking" class="anchor" href="#get-hacking"><span class="octicon octicon-link"></span></a>Get Hacking</h4>
+        <h4>
+            <a name="requirements-1" class="anchor" href="#requirements-1"><span class="octicon octicon-link"></span></a>Requirements</h4>
 
-<ol>
-<li>
-<code>git clone https://github.com/justjake/teeveed</code> or similar to get the source</li>
-<li>
-<code>cd teeveed</code>, <code>mvn initialize</code> will download and install the required rubygems
-in <code>teeveed/target/rubygems</code>
-</li>
-<li>
-<code>source env.sh</code> will correct your <code>$GEM_HOME</code> and <code>$RUBY_LIB</code> environment variables
-to point to the gems installed in <code>teeveed/target/rubygems</code> and the teeveed sources.</li>
-<li>Hack away. run <code>teeveed</code> (alias provided by env.sh) to start the daemon, or
-<code>cli</code> to start the Pry command line.</li>
-</ol><p>If things feel too slow,
-You should get <a href="https://github.com/flatland/drip">drip</a> in your ~/bin,
-and then <code>source drip.env.sh</code> before launching any of this ruby junk.
-Drip'll put the spring back in your step!</p>
+        <ul>
+            <li>Java JDK 1.7</li>
+            <li>Maven 2+ (for HUD)</li>
+            <li>a Postgres database</li>
+        </ul><p>The only reason we need Maven and the JDK is because (right now)
+        teeveed isn't packaged as a JavaFX runtime app. Because the JavaFX
+        runtime does some interesting <a href="http://zenjava.com/javafx/maven/fix-classpath.html">native loading things</a>,
+        the simplest way is just to move the JavaFX libraries into the
+        implicit system classpath.</p>
 
-<h2>
-<a name="installation" class="anchor" href="#installation"><span class="octicon octicon-link"></span></a>Installation</h2>
+        <p>I will get around to fixing this, but it's low priority for my own
+        machines.</p>
 
-<h4>
-<a name="requirements-1" class="anchor" href="#requirements-1"><span class="octicon octicon-link"></span></a>Requirements</h4>
+        <h4>
+            <a name="instructions" class="anchor" href="#instructions"><span class="octicon octicon-link"></span></a>Instructions</h4>
 
-<ul>
-<li>Java JDK 1.7</li>
-<li>Maven 2+ (for HUD)</li>
-<li>a Postgres database</li>
-</ul><p>The only reason we need Maven and the JDK is because (right now)
-teeveed isn't packaged as a JavaFX runtime app. Because the JavaFX
-runtime does some interesting <a href="http://zenjava.com/javafx/maven/fix-classpath.html">native loading things</a>,
-the simplest way is just to move the JavaFX libraries into the
-implicit system classpath.</p>
+        <ol>
+            <li>
+            <p><code>(sudo) mvn com.zenjava:javafx-maven-plugin:2.0:fix-classpath</code></p>
 
-<p>I will get around to fixing this, but it's low priority for my own
-machines.</p>
+            <p>This moves JavaFX onto the classpath so the JavaFX libraries are
+            always loaded. <strong>THIS STEP IS ONLY REQUIRED ON USER-INTERFACE MACHINES</strong></p>
+            </li>
+            <li><p>make a directory for all of the teeveed resources. I like <code>~/teeveed</code>.</p></li>
+            <li> copy <code>teeveed-0.2.2.jar</code> and <code>example.teeveed.conf.rb</code> into
+            your teeveed folder.</li>
+            <li> copy <code>teeveed.sh</code> into your <code>~/bin</code> or somewhere else on your path,
+            and modify <code>$TEEVEED_HOME</code> in it to point to your teeveed folder.</li>
+            <li> Create a Postgres database and user for teeveed. Make sure your
+            postgres instance is accessable over TCP (unencrypted)</li>
+            <li>
+            <p>Change <code>example.teeveed.conf.rb</code> so that it matches your setup.
+            Important things to change:</p>
 
-<h4>
-<a name="instructions" class="anchor" href="#instructions"><span class="octicon octicon-link"></span></a>Instructions</h4>
+            <ul>
+                <li>
+                <code>database</code> command to match the setup of your Postgres database</li>
+                <li>
+                <code>library</code> command's path should be '/path/to/your/media'</li>
+                <li>You'll need to insert your Wit.ai token for the <code>teeveed</code> instance</li>
+            </ul>
+            </li>
+        </ol><h2>
+            <a name="goals" class="anchor" href="#goals"><span class="octicon octicon-link"></span></a>Goals</h2>
 
-<ol>
-<li>
-<p><code>(sudo) mvn com.zenjava:javafx-maven-plugin:2.0:fix-classpath</code></p>
+        <h4>
+            <a name="index" class="anchor" href="#index"><span class="octicon octicon-link"></span></a>Index</h4>
 
-<p>This moves JavaFX onto the classpath so the JavaFX libraries are
-always loaded. <strong>THIS STEP IS ONLY REQUIRED ON USER-INTERFACE MACHINES</strong></p>
-</li>
-<li><p>make a directory for all of the teeveed resources. I like <code>~/teeveed</code>.</p></li>
-<li> copy <code>teeveed-0.2.2.jar</code> and <code>example.teeveed.conf.rb</code> into
-your teeveed folder.</li>
-<li> copy <code>teeveed.sh</code> into your <code>~/bin</code> or somewhere else on your path,
-and modify <code>$TEEVEED_HOME</code> in it to point to your teeveed folder.</li>
-<li> Create a Postgres database and user for teeveed. Make sure your
-postgres instance is accessable over TCP (unencrypted)</li>
-<li>
-<p>Change <code>example.teeveed.conf.rb</code> so that it matches your setup.
-Important things to change:</p>
+        <ul>
+            <li>Keep a fast index of all the media on a share for quick search (DONE)</li>
+            <li>index needs to respond to natural-language searches (DONE)
 
-<ul>
-<li>
-<code>database</code> command to match the setup of your Postgres database</li>
-<li>
-<code>library</code> command's path should be '/path/to/your/media'</li>
-<li>You'll need to insert your Wit.ai token for the <code>teeveed</code> instance</li>
-</ul>
-</li>
-</ol><h2>
-<a name="goals" class="anchor" href="#goals"><span class="octicon octicon-link"></span></a>Goals</h2>
+            <ul>
+                <li>few spelling mistakes, mostly word transpositions (TODO: switch to trigram)</li>
+            </ul>
+            </li>
+            <li>deleted items should be pruned regularly (DONE)</li>
+            <li>delegte music indexing and search to Spotify (TODO)</li>
+        </ul><h5>
+            <a name="strategy" class="anchor" href="#strategy"><span class="octicon octicon-link"></span></a>Strategy</h5>
 
-<h4>
-<a name="index" class="anchor" href="#index"><span class="octicon octicon-link"></span></a>Index</h4>
+        <p>The index is stored in a PostgeSQL database, which gets us nice
+        full-text-search for free. Indexing is performed by crawling each
+        library section on a specified schedule, and adding new items, and
+        removing old items based on a <code>last_seen</code> timestamp.</p>
 
-<ul>
-<li>Keep a fast index of all the media on a share for quick search (DONE)</li>
-<li>index needs to respond to natural-language searches (DONE)
+        <p>At some point we should use the following algorithm when returning
+        search results, so that we never return a file that doesn't exist:</p>
 
-<ul>
-<li>few spelling mistakes, mostly word transpositions (TODO: switch to trigram)</li>
-</ul>
-</li>
-<li>deleted items should be pruned regularly (DONE)</li>
-<li>delegte music indexing and search to Spotify (TODO)</li>
-</ul><h5>
-<a name="strategy" class="anchor" href="#strategy"><span class="octicon octicon-link"></span></a>Strategy</h5>
-
-<p>The index is stored in a PostgeSQL database, which gets us nice
-full-text-search for free. Indexing is performed by crawling each
-library section on a specified schedule, and adding new items, and
-removing old items based on a <code>last_seen</code> timestamp.</p>
-
-<p>At some point we should use the following algorithm when returning
-search results, so that we never return a file that doesn't exist:</p>
-
-<div class="highlight highlight-ruby"><pre><span class="c1"># Array&lt;Media&gt; returned in ranked order from best to worst match</span>
+        <div class="highlight highlight-ruby"><pre><span class="c1"># Array&lt;Media&gt; returned in ranked order from best to worst match</span>
 <span class="n">results</span> <span class="o">=</span> <span class="n">root</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="ss">:title</span> <span class="o">=&gt;</span> <span class="s2">"the good the bad the ugly"</span><span class="p">,</span> <span class="ss">:sense</span> <span class="o">=&gt;</span> <span class="ss">:watch</span><span class="p">)</span>
 <span class="n">results</span><span class="o">.</span><span class="n">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">hit</span><span class="o">|</span>
     <span class="n">path</span> <span class="o">=</span> <span class="no">Pathname</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">root</span><span class="o">.</span><span class="n">path</span><span class="p">)</span> <span class="o">+</span> <span class="n">hit</span><span class="o">.</span><span class="n">relative_path</span>
@@ -185,32 +191,32 @@ search results, so that we never return a file that doesn't exist:</p>
     <span class="n">path</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">realpath</span><span class="o">.</span><span class="n">to_s</span>
     <span class="k">return</span> <span class="no">Result</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">hit</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span>
 <span class="k">end</span>
-</pre></div>
+        </pre></div>
 
-<h4>
-<a name="natural-language-interface" class="anchor" href="#natural-language-interface"><span class="octicon octicon-link"></span></a>Natural Language Interface</h4>
+        <h4>
+            <a name="natural-language-interface" class="anchor" href="#natural-language-interface"><span class="octicon octicon-link"></span></a>Natural Language Interface</h4>
 
-<ul>
-<li><p>User story: you sit down on the couch and say,
-"Ok tv. do we have the new Game of Thrones?"</p></li>
-<li><p>User story: you want to quickly start music playing while
-in the kitchen. "Ok tv. Play songs by Royksopp"</p></li>
-</ul><p>We use <a href="http://wit.ai"><strong>Wit.ai</strong></a> to interpret user intents from plain
-text. Intent behavior is defined in <code>lib/teevee/daemon/intent_controller.rb</code>,
-which performs dispatch based on intent type.</p>
+        <ul>
+            <li><p>User story: you sit down on the couch and say,
+            "Ok tv. do we have the new Game of Thrones?"</p></li>
+            <li><p>User story: you want to quickly start music playing while
+            in the kitchen. "Ok tv. Play songs by Royksopp"</p></li>
+        </ul><p>We use <a href="http://wit.ai"><strong>Wit.ai</strong></a> to interpret user intents from plain
+        text. Intent behavior is defined in <code>lib/teevee/daemon/intent_controller.rb</code>,
+        which performs dispatch based on intent type.</p>
 
-<h4>
-<a name="visual-indicators-done" class="anchor" href="#visual-indicators-done"><span class="octicon octicon-link"></span></a>Visual indicators (DONE)</h4>
+        <h4>
+            <a name="visual-indicators-done" class="anchor" href="#visual-indicators-done"><span class="octicon octicon-link"></span></a>Visual indicators (DONE)</h4>
 
-<p>teeveed uses a simple JavaFX window to display user intents and
-matched entities on-screen. All intents are automatically
-displayed before they are handled, and the results of the handler
-(anything with a :friendly_name) function are displayed when the
-handler completes.</p>
-      </section>
+        <p>teeveed uses a simple JavaFX window to display user intents and
+        matched entities on-screen. All intents are automatically
+        displayed before they are handled, and the results of the handler
+        (anything with a :friendly_name) function are displayed when the
+        handler completes.</p>
+    </section>
 
-    </div>
-    <!--[if !IE]><script>fixScale(document);</script><![endif]-->
-    
-  </body>
+</div>
+<!--[if !IE]><script>fixScale(document);</script><![endif]-->
+
+</body>
 </html>

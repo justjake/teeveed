@@ -532,16 +532,17 @@ body {
   padding: 0px 0 20px 0px;
   margin: 0px;
   font: 14px/1.5 "OpenSansRegular", "Helvetica Neue", Helvetica, Arial, sans-serif;
-  color: #f0e7d5;
+  /*color: #f0e7d5;*/
+  color: #e7e7e7;
   font-weight: normal;
   background: #252525;
   background-attachment: fixed !important;
-  background: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #2a2a29), color-stop(100%, #1c1c1c));
-  background: -webkit-linear-gradient(#2a2a29, #1c1c1c);
-  background: -moz-linear-gradient(#2a2a29, #1c1c1c);
-  background: -o-linear-gradient(#2a2a29, #1c1c1c);
-  background: -ms-linear-gradient(#2a2a29, #1c1c1c);
-  background: linear-gradient(#2a2a29, #1c1c1c);
+  background: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #222222), color-stop(100%, #111111));
+  background: -webkit-linear-gradient(#222222, #111111);
+  background: -moz-linear-gradient(#222222, #111111);
+  background: -o-linear-gradient(#222222, #111111);
+  background: -ms-linear-gradient(#222222, #111111);
+  background: linear-gradient(#222222, #111111);
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -800,11 +801,12 @@ section #title h1 {
   line-height: 36px;
 }
 section #title p {
-  color: #d7cfbe;
+  color: #fff;
   font-family: 'OpenSansLight', "Helvetica Neue", Helvetica, Arial, sans-serif;
   font-weight: normal;
-  font-size: 18px;
+  font-size: 30px;
   text-align: center;
+  text-shadow: 0px 1px 15px #999;
 }
 section #title .credits {
   font-size: 11px;
