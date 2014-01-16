@@ -1,5 +1,5 @@
 # test config file
-database 'postgres://teeveed:teeveed@localhost/teeveed'
+database 'jdbc:postgresql://localhost/teeveed?user=teeveed&password=teeveed'
 
 path = (Pathname.new(__FILE__).parent.parent+'arena/library').to_s
 
