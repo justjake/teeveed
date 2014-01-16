@@ -151,8 +151,8 @@ module Teevee
       # run em in threads
       Teevee.log(1, 'daemon', "starting #{app.plugins.length} plugins")
       app.plugins.each do |plugin|
+        Teevee.log(2, 'daemon', "starting #{plugin.class.to_s}")
         threads << Thread.new do
-          Teevee.log(2, 'daemon', "starting #{plugin.class.to_s}")
           plugin.run!
           Teevee.log(2, 'daemon', "finished #{plugin.class.to_s}")
         end
