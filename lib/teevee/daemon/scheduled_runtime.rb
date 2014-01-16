@@ -3,6 +3,9 @@ module Teevee
   module Daemon
     # the scope in which users scheduled actions are run
     class ScheduleRuntime
+
+      attr_reader :app
+
       def initialize(app)
         @app = app
       end
@@ -12,7 +15,7 @@ module Teevee
       def scan_for_changes(path)
         path = Pathname.new(path)
         path = @app.root.pathname + path if path.relative?
-        app.indexer.scan(path)
+        @app.indexer.scan(path)
       end
 
       # destroy everything and start over

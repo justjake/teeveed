@@ -104,7 +104,8 @@ module Teevee
         app.plugins << instance
       end
 
-      ### run-then-exit
+
+      ### run-then-exit #############################################
       run_then_exit = false
       RUN_THEN_EXIT_OPTIONS.each{|tool| run_then_exit = tool if opts[tool]}
       if run_then_exit
@@ -129,7 +130,8 @@ module Teevee
         exit 0
       end
 
-      ### daemon
+
+      ### daemon ####################################################
       threads = []
 
       # scheduled actions
@@ -138,7 +140,8 @@ module Teevee
         scheduler = Rufus::Scheduler.new
         scheduler.pause
         config[:schedules].each do |spec|
-          scheduler.send(spec[0]. spec[1]) {ScheduleRuntime.new(app).instance_eval(spec[2])}
+          action = Proc.new {ScheduleRuntime.new(app).instance_eval(&spec[2])}
+          scheduler.send(spec[0], spec[1], &action)
         end
         threads << scheduler
         scheduler.resume
@@ -148,9 +151,11 @@ module Teevee
       # run em in threads
       Teevee.log(1, 'daemon', "starting #{app.plugins.length} plugins")
       app.plugins.each do |plugin|
-        Teevee.log(2, 'daemon', "starting #{plugin.class.to_s}")
-        threads << Thread.new{plugin.run!}
-        Teevee.log(2, 'daemon', "finished #{plugin.class.to_s}")
+        threads << Thread.new do
+          Teevee.log(2, 'daemon', "starting #{plugin.class.to_s}")
+          plugin.run!
+          Teevee.log(2, 'daemon', "finished #{plugin.class.to_s}")
+        end
       end
 
       # wait for all plugins to finish (never happens ;)
