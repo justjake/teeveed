@@ -4,4 +4,4 @@
 # see drip.env.sh
 
 require 'teevee'
-require 'teevee/daemon'
+require 'teevee/application'

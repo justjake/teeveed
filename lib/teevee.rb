@@ -26,5 +26,7 @@ module Teevee
   end
 end
 
-# NLP api
 require 'teevee/wit'
+require 'teevee/intent_controller'
+require 'teevee/plugin'
+require 'teevee/application'

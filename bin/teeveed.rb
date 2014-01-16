@@ -52,7 +52,7 @@ end
 require 'teevee'
 require 'teevee/library/root'
 require 'teevee/library/indexer'
-require 'teevee/daemon'
+require 'teevee/application'
 
 # prepare logging
 Teevee.log_level = opts[:verbosity]
