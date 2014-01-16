@@ -13,7 +13,7 @@ module Teevee
 
   def self.log(level, *texts)
     if level <= log_level
-      puts " % Teevee #{level}) " + texts.join(': ')
+      puts "[#{level}] Teevee --> " + texts.join(': ')
     end
   end
 end
