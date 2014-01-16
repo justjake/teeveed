@@ -1,3 +1,4 @@
+# -*- encoding : utf-8 -*-
 # loads user configs and instance-evals them
 require 'pathname'
 require 'active_support/core_ext/numeric/time'

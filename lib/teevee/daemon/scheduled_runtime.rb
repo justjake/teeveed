@@ -1,3 +1,4 @@
+# -*- encoding : utf-8 -*-
 module Teevee
   module Daemon
     # the scope in which users scheduled actions are run

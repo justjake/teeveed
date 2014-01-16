@@ -1,3 +1,4 @@
+# -*- encoding : utf-8 -*-
 # program entrypoint and main function
 # publicly requireable
 
@@ -107,7 +108,7 @@ module Teevee
       run_then_exit = false
       RUN_THEN_EXIT_OPTIONS.each{|tool| run_then_exit = tool if opts[tool]}
       if run_then_exit
-        Teevee.log('tool', "running tool #{run_then_exit}")
+        Teevee.log(3, 'tool', "running tool #{run_then_exit}")
 
         case run_then_exit
           when :scan
@@ -124,7 +125,7 @@ module Teevee
             raise 'unreachable else in run_then_exit'
         end
 
-        Teevee.log('tool', "#{run_then_exit} finished")
+        Teevee.log(3, 'tool', "#{run_then_exit} finished")
         exit 0
       end
 

@@ -1,3 +1,4 @@
+# -*- encoding : utf-8 -*-
 # Debug the running teeveed instancw with 'pry-remote'
 require 'pry-remote'
 
