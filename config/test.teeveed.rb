@@ -4,11 +4,11 @@ database 'jdbc:postgresql://localhost/teeveed?user=teeveed&password=teeveed'
 path = (Pathname.new(__FILE__).parent.parent+'arena/library').to_s
 
 library path do
-  section 'Television' => Episode
-  section 'Movies' => Movie
+  section 'Television' => :Episode
+  section 'Movies' => :Movie
 end
 
-webui ip: '0.0.0.0', port: 1337
+plugin :web_ui, ip: '0.0.0.0', port: 1337
 
 # enable_remote_debugging
 scan_at_startup
