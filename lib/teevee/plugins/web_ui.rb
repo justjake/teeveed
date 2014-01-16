@@ -16,15 +16,17 @@ module Teevee
       # @option opts :port [Integer] port to listen on
       def initialize(app, opts)
         super(app, opts)
-        if not (opts.include? :ip and opts.include? :port and opts.include? :wit_token)
-          raise ArgumentError, 'WebUI options must include :ip, :port, and :wit_token'
+        if not (opts.include? :ip and opts.include? :port)
+          raise ArgumentError, 'WebUI options must include :ip and :port'
         end
+
+        raise ArgumentError, "#{self.class.to_s} requires a wit_token" if app.wit_token.nil?
 
         # pass on everything to the Sinatra app.
         Server.set :app, app
         Server.set :bind, opts[:ip]
         Server.set :port, opts[:port]
-        Server.set :wit_token, opts[:wit_token]
+        Server.set :wit_token, app.wit_token
       end
 
       def run!
