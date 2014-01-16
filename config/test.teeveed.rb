@@ -9,9 +9,11 @@ library path do
 end
 
 plugin :web_ui, ip: '0.0.0.0', port: 1337
+plugin :remote_debugger
+plugin :heads_up_display
 
 # enable_remote_debugging
-scan_at_startup
+# scan_at_startup
 log_level 4  # show prunings but not most scan bullshit at lvl 5
 
 schedule :every, 1.minutes do
