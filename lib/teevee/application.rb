@@ -8,12 +8,12 @@ module Teevee
   class Application
     attr_reader :root, :indexer, :vlc, :options, :plugins
 
-    def initialize(root, indexer, opts)
+    def initialize(root, indexer, plugins, opts)
       @root = root
       @indexer = indexer
       @vlc = VLC::System.new('127.0.0.1', 9999, auto_start: false)
       @options = opts
-      @plugins = Teevee::Plugin::List.new
+      @plugins = Teevee::Plugin::List.new(plugins)
     end
   end # end Application
 

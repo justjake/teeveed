@@ -3,12 +3,25 @@ module Teevee
   # API for creating plugins
   module Plugin
 
+    # Just lists the contents of /teevee/plugins/
+    def self.built_in
+      require 'pathname'
+      (Pathname.new(__FILE__).parent + 'plugins').children(false)
+        .map{|fn| fn.to_s}
+    end
+
     # perform library includes and stuff. Intended to be called from Runtime
+    # You can specify a plutin outside of the built-in plugin folders
+    # by supplying a string (with at least one '/') instead of a Symbol
     # @param plugin_name [String, Symbol]
     # @param opts [Hash]
     # @return [is_a? Teevee::Plugin::Base] instantiated plugin
     def self.load_and_instantiate(plugin_name, opts)
-      require "teevee/plugins/#{plugin_name}"
+      if plugin_name.is_a? String and plugin_name.include? '/'
+        require plugin_name
+      else
+        require "teevee/plugins/#{plugin_name.to_s}"
+      end
       latest_plugin = Teevee::Plugins::LOADED_PLUGINS.last
       setup(lastest_plugin)
       latest_plugin.new(opts)

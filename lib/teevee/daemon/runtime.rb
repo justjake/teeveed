@@ -33,6 +33,15 @@ module Teevee
         @options = opts.dup
       end
 
+      # Load a plugin
+      # @param plugin_name [String, Symbol] filename of plugin in /teevee/plugins/
+      # @param opts [Hash] options for the plugin
+      def plugin(plugin_name, opts = {})
+        @plugins ||= []
+        instance = Teevee::Plugin.load_and_instantiate(plugin_name.to_s, opts)
+        @plugins << instance
+      end
+
       def enable_remote_debugging
         @options[:remote] = true
       end
@@ -147,7 +156,7 @@ module Teevee
         end
 
         Teevee.log 5, 'boot', 'creating application'
-        app = Daemon.instance = Teevee::Daemon::Application.new(@root, @indexer, opts)
+        app = Teevee::Application.new(@root, @indexer, @plugins, opts)
 
         # --scan or scan_at_startup
         if opts[:scan]
