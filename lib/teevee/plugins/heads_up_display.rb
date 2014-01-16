@@ -24,7 +24,7 @@ module Teevee
       def after_intent_handler(controller, result)
         hud = HUD.new
         hud.update do
-          hud.push_results!(res)
+          hud.push_results!(result)
           hud.hide_in(30) # 30 seconds timeout
         end
         return result
