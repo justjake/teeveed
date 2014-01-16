@@ -41,7 +41,7 @@ module Teevee
     #
     # Your plugin filename and classname are linked. The user will
     # specify your plugin during configuration using the `plugin`
-    # method in teevee/daemon/runtime.rb:
+    # method in teevee/daemon/sconfig_dsl.rb:
     # @example:
     #   plugin :my_plugin, :opt1 => 'hi', :opt2 => 'hello'
     # When this happens, teeveed will require 'teevee/plugins/my_plugin'
