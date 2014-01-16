@@ -14,7 +14,7 @@ module Teevee
       # @param opts [Hash] options
       # @option opts :ip [String] IP address to listen on
       # @option opts :port [Integer] port to listen on
-      def initialize(app, pts)
+      def initialize(app, opts)
         super(app, opts)
         if not (opts.include? :ip and opts.include? :port and opts.include? :wit_token)
           raise ArgumentError, 'WebUI options must include :ip, :port, and :wit_token'

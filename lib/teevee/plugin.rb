@@ -35,8 +35,8 @@ module Teevee
     # @return [is_a? Teevee::Plugin::Base] instantiated plugin
     def self.load_and_instantiate(plugin_name, app, opts)
       latest_plugin = self.load(plugin_name)
-      setup(lastest_plugin)
-      latest_plugin.new(opts)
+      setup(latest_plugin)
+      latest_plugin.new(app, opts)
     end
 
     # Base class for teeved plugins.

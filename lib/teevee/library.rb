@@ -5,9 +5,7 @@ module Teevee
   # logical library root, and populate it with sections. Each
   # section is a subclass of Library::Media, with defined regexes
   # Section.prefix, Section.suffix, and Section.regex
-  #
-  # TODO: fixtures for scanning the libray for changes, and garbage
-  # collecting the database
+  # can only be required after connecting to the database
   module Library
   end
 
