@@ -5,8 +5,16 @@ Plugins allow for clean dilineation of features into different,
 independent files. Plugins are files that live in `lib/teeveed/plugis/`
 that define an entire new feature.
 
-I plan to port the following features to independent plugins:
-- plugin:
+## PLUGIN REACTORING TODOS
+
+TODO: rework Runtime as a ConfigDSL class and load user config with
+      an instance_eval
+
+TODO: create app before loading user config so we can pass it immidatly
+      to plugins in DSL phase (or do alternative??)
+
+TODO: need to work in the web_ui and heads_up_display plugins
+      so that boot procedes as normal
 
 Through a plugin, you may:
 

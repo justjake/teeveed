@@ -10,26 +10,33 @@ module Teevee
         .map{|fn| fn.to_s}
     end
 
-    # perform library includes and stuff. Intended to be called from Runtime
-    # You can specify a plutin outside of the built-in plugin folders
+
+    # Load a plugin from disk
+    # You can specify a plugin outside of the built-in plugin folders
     # by supplying a string (with at least one '/') instead of a Symbol
     # @param plugin_name [String, Symbol]
-    # @param opts [Hash]
-    # @return [is_a? Teevee::Plugin::Base] instantiated plugin
-    def self.load_and_instantiate(plugin_name, opts)
+    def self.load(plugin_name)
       if plugin_name.is_a? String and plugin_name.include? '/'
         require plugin_name
       else
         require "teevee/plugins/#{plugin_name.to_s}"
       end
-      latest_plugin = Teevee::Plugins::LOADED_PLUGINS.last
-      setup(lastest_plugin)
-      latest_plugin.new(opts)
+      Teevee::Plugins::LOADED_PLUGINS.last
     end
 
-    # Set up a newly-loaded plugin
+    # Set up a newly-loaded plugin. Mixes the pluin's IntentHandlers
+    # into IntentController.
     def self.setup(klass)
       Teevee::IntentController.send(:include, klass::IntentHandlers)
+    end
+
+    # perform library includes and stuff. Intended to be called from Runtime
+    # @param opts [Hash]
+    # @return [is_a? Teevee::Plugin::Base] instantiated plugin
+    def self.load_and_instantiate(plugin_name, app, opts)
+      latest_plugin = self.load(plugin_name)
+      setup(lastest_plugin)
+      latest_plugin.new(opts)
     end
 
     # Base class for teeved plugins.
@@ -39,16 +46,13 @@ module Teevee
         Teevee::Plugins::LOADED_PLUGINS << child_class
       end
 
-      # Gets the latest (and usually only) instance of your plugin
-      # I haven't decided if this API is advisable
-      def self.instance
-        @@instance
+      # Empty module
+      # will be over-written in subclasses to provide new intent handlers
+      module IntentHandlers
       end
 
-      def initialize(opts)
-        @@instance = self
-        log(6, "instantiated plugin #{self.class.to_s}", opts.to_s)
-      end
+      ### API
+      attr_reader :app
 
       # Log information from your plugin.
       # @param level [Integer] log level. Lower is more likely to be logged
@@ -57,11 +61,52 @@ module Teevee
         Teevee.log(level, self.class.to_s, *texts)
       end
 
-      # Empty module
-      # will be over-written in subclasses to provide new intent handlers
-      module IntentHandlers
+      ### Methods to override
+
+      # @param app [Teevee::Applicatio]
+      # @param opts [Hash]
+      def initialize(app, opts)
+        log(6, "instantiated plugin #{self.class.to_s}", opts.to_s)
+        @app = app
       end
-    end
+
+      ### Hooks - optional
+
+      # Your plugin's daemon thread, if you need one.
+      # Called in a thread at the end of the boot process during
+      # daemonization.
+      # When all plugin threads return, teeveed will exit.
+      def run!
+      end
+
+      # Run (in order of plugin definition) on any intent coming into
+      # the IntentController.
+      # This intent may act as middleware, meaning you can return
+      # any intent you want to and it will be passed down the line of
+      # before_intent_handlers and then handed off to the IntentController
+      # itself.
+      #
+      # usually just a good idea to return the intent as-it-was, though
+      #
+      # @param [Teevee::Daemon::IntentController] controller
+      # @param [Teevee:;Wit::Intent] intent
+      # @return [Teevee::Wit::Intent]
+      def before_intent_handler(controller, intent)
+        return intent
+      end
+
+      # Run (in order of plugin definition) on the result of any
+      # intent handled by the intent controller
+      # again, acts as middleware on the return result
+      #
+      # @param [Teevee::Daemon::IntentController] controller
+      # @param [Any] result
+      # @return [Any] result
+      def after_intent_handler(controller, result)
+        return result
+      end
+
+    end # end Base
 
     # Plugins list with shorthand selectors
     class List < Array

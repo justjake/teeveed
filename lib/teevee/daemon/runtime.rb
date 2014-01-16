@@ -181,6 +181,11 @@ module Teevee
           @scheduler.resume
         end
 
+        # boot all plugins
+        app.plugins.each do |plugin|
+          threads << Thread.new{plugin.run!}
+        end
+
         # --web - natural language interface via mobile web
         if opts[:web]
           Teevee.log 1, 'boot', 'starting web remote'
@@ -203,15 +208,6 @@ module Teevee
             end
           end
           threads << debug
-        end
-
-        # --hud - show on-screen display
-        if opts[:hud]
-          require 'teevee/daemon/hud'
-          hud = Thread.new do
-            Teevee::Daemon::HUD.start
-          end
-          threads << hud
         end
 
         Teevee.log 1, 'boot', 'daemon started successfully.'

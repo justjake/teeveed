@@ -21,5 +21,4 @@ module Teevee
 end
 
 require 'teevee/daemon/cli'
-require 'teevee/daemon/web_remote'
 require 'teevee/daemon/runtime'

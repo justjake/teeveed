@@ -13,7 +13,6 @@ module Teevee
 
     def initialize(application)
       @app = application
-      @hud = HUD.new(@app.options[:hud])
     end
 
     # add wait-time while starting VLC server.
@@ -27,22 +26,17 @@ module Teevee
       _vlc
     end
 
+    def plugins
+      @app.plugins
+    end
+
     def handle_intent(intent)
       if self.respond_to? intent.type
         log 3, "Handling a #{intent.type.to_s} intent"
 
-        @hud.update do
-          @hud.clear_alerts!
-          @hud.push_intent!(intent)
-          @hud.show!
-        end
-
+        plugins.each{|plg| intent = plg.before_intent_handler(self, intent)}
         res = self.send(intent.type, intent)
-
-        @hud.update do
-          @hud.push_results!(res)
-          @hud.hide_in(30) # 30 seconds timeout
-        end
+        plugins.each{|plg| res = plg.after_intent_handler(self, res)}
 
         return res
       end
