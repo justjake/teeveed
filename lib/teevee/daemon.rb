@@ -75,6 +75,7 @@ module Teevee
       Teevee.log(1, 'boot', 'STARTING UP')
       Teevee.log(5, 'boot', 'loading user config...')
       config = Teevee::Daemon::ConfigDSL.load(opts[:config]).to_hash
+      raise ConfigError, 'no database specified' unless config.include? :database_uri
 
       ### enact settings
       opts = opts.merge(config[:options])

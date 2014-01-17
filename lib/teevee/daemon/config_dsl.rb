@@ -44,7 +44,6 @@ module Teevee
 
       # @return all instance variables as a hash
       def to_hash
-        raise ConfigError, 'no database specified' unless instance_variable_defined? :@database_uri
         res = {}
         self.instance_variables.each do |varname|
           res[varname.to_s[1..-1].to_sym] = instance_variable_get(varname)
