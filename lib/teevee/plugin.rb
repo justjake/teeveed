@@ -41,14 +41,36 @@ module Teevee
     end
 
     # Base class for teeved plugins.
+    #
+    # Plugins allow for clean delineation of features into different,
+    # independent files. Plugins are files that live in `lib/teeveed/plugins/`
+    # that define an entire new feature.
+    #
+    # Through a plugin, you may:
+    #
+    # - boot a thread at daemon startup
+    # - handle new Wit.ai intents by providing new methods for the
+    #   IntentController
+    # - hood intent handling to provide user interface updates
+    #   before and after intent handlers are performed
+    #
+    # when you plugin is loaded, it becomes the last thing in LOADED_PLUGINS,
+    # which is then instantiated and appended to the app's plugins field.
+    #
+    # NOTE THAT THIS IS SPELLED Teevee::Plugin::Base. Plugin, not Plugins!
     class Base
       # this is how plugins end up in Teevee::Plugins::LOADED_PLUGINS
       def self.inherited(child_class)
         Teevee::Plugins::LOADED_PLUGINS << child_class
       end
 
-      # Empty module
-      # will be over-written in subclasses to provide new intent handlers
+      # submodule for adding Wit.ai intent handlers. This module will
+      # be included directly into Teevee::Daemon::IntentController,
+      # so it should have only sanitary methods in it
+      #
+      # Methods in IntentHandlers should have the same name as the
+      # intent type they should handle, eg, for a :foobar intent,
+      # you define a method foobar(intent)
       module IntentHandlers
       end
 
@@ -64,7 +86,12 @@ module Teevee
 
       ### Methods to override
 
-      # @param app [Teevee::Applicatio]
+      # Called when the plugin is activated during application boot.
+      # `initialize` should store your options somewhere and do initial
+      # setup, but not start persisten actions in a thread or something.
+      # long-running actions should be performed in #run!
+      #
+      # @param app [Teevee::Application]
       # @param opts [Hash]
       def initialize(app, opts)
         log(6, "instantiated plugin #{self.class.to_s}", opts.to_s)
@@ -80,6 +107,8 @@ module Teevee
       def run!
       end
 
+      # Wit intent middleware.
+      #
       # Run (in order of plugin definition) on any intent coming into
       # the IntentController.
       # This intent may act as middleware, meaning you can return
@@ -96,6 +125,8 @@ module Teevee
         return intent
       end
 
+      # IntentHandler result middleware.
+      #
       # Run (in order of plugin definition) on the result of any
       # intent handled by the intent controller
       # again, acts as middleware on the return result
@@ -117,7 +148,11 @@ module Teevee
         self.select{|plugin| plugin.respond_to? meth_name}
       end
 
-      # Selects the first plugin of a given type
+      # Selects the first plugin of a given type.
+      # this makes it easy to reach back to your plugin instance from
+      # any intent handler in an IntentController, ex:
+      #   plugin_instance = plugins.of_type My::Plugin::Class
+      #
       # @param klass [Class]
       def of_type(klass)
         self.find{|plugin| plugin.is_a? klass}
