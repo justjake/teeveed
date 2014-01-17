@@ -2,6 +2,7 @@
 require 'pp' # needed for #pretty_inspect
 require 'sinatra/base'
 require 'haml'
+require 'sass'
 
 # Core plugin.
 # receives text from users via their smartphones, and then
