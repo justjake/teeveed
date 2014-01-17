@@ -157,7 +157,7 @@ module Teevee
             season = Teevee::Library::Episode.where(
                 :show => episode.show,
                 :season => episode.season
-            ).where{episode_num > sensible_num} .order(:episode_num).to_a
+            ).where{episode_num >= sensible_num} .order(:episode_num).to_a
 
             playlist = season.map{ |f| @app.root.abs_path f.relative_path }
 
