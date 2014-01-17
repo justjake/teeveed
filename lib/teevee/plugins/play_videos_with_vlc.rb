@@ -8,15 +8,28 @@ module Teevee
       DEFAULT_VLC_PARAMS = {
           :host => '127.0.0.1',
           :port => 9999,
-          :auto_start => false
+          :auto_start => false,
+          :fullscreen => false,
+          # these are conservative values, 0.6 and 0.1 may be better on
+          # your i7 or whatever
+          :startup_lag => 5, # seconds to wait for VLC to start up
+          :connect_lag => 1  # seconds to wait for teeveed to connect to VLC
       }
 
       def initialize(app, opts)
         opts = DEFAULT_VLC_PARAMS.merge(opts || {})
         host = opts.delete :host
         port = opts.delete :port
+        @fullscreen = opts.delete :fullscreen
+        @startup = opts.delete :startup_lag
+        @connect = opts.delete :connect_lag
+
         @vlc = VLC::System.new(host, port, opts)
         @mutex = Mutex.new
+      end
+
+      def should_fullscreen?
+        @fullscreen
       end
 
       # Perform a block in a new thread with exclusive access to the VLC interface
@@ -37,12 +50,12 @@ module Teevee
       def _connected_vlc
         if @vlc.server.stopped?
           @vlc.server.start
-          sleep 5 # healthy sleep value for VLC to boot
+          sleep @startup # healthy sleep value for VLC to boot
         end
 
         if @vlc.client.disconnected?
           @vlc.client.connect
-          sleep 1 # another healthy sleep value
+          sleep @connect # another healthy sleep value
         end
 
         @vlc
@@ -72,6 +85,7 @@ module Teevee
             _vlc.with_vlc do |vlc|
               vlc.clear
               vlc.play @app.root.abs_path(movies.first.relative_path)
+              vlc.fullscreen if _vlc.should_fullscreen?
             end
             return movies.first
           end
@@ -139,6 +153,7 @@ module Teevee
               vlc.clear # clear pkaylist
               playlist.each{|f| vlc.add_to_playlist(f) }
               vlc.play
+              vlc.fullscreen if _vlc.should_fullscreen?
             end
 
             return season
@@ -146,6 +161,7 @@ module Teevee
 
           _vlc.with_vlc do |vlc|
             vlc.play @app.root.abs_path(episode.relative_path)
+            vlc.fullscreen if _vlc.should_fullscreen?
           end
 
           episode
@@ -158,6 +174,7 @@ module Teevee
         def _vlc
           plugins.of_type Teevee::Plugins::PlayVideosWithVLC
         end
+
       end
 
     end
