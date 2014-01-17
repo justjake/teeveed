@@ -116,6 +116,12 @@ module Teevee
       def with_method(meth_name)
         self.select{|plugin| plugin.respond_to? meth_name}
       end
+
+      # Selects the first plugin of a given type
+      # @param klass [Class]
+      def of_type(klass)
+        self.find{|plugin| plugin.is_a? klass}
+      end
     end
   end
 
