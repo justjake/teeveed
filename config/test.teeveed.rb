@@ -1,17 +1,20 @@
 # test config file
-database 'postgres://teeveed:teeveed@localhost/teeveed'
+database 'jdbc:postgresql://localhost/teeveed?user=teeveed&password=teeveed'
 
 path = (Pathname.new(__FILE__).parent.parent+'arena/library').to_s
 
 library path do
-  section 'Television' => Episode
-  section 'Movies' => Movie
+  section 'Television' => :Episode
+  section 'Movies' => :Movie
 end
 
-webui ip: '0.0.0.0', port: 1337
+plugin :web_ui, ip: '0.0.0.0', port: 1337
+plugin :remote_debugger
+plugin :heads_up_display
+plugin :play_videos_with_vlc
 
 # enable_remote_debugging
-scan_at_startup
+# scan_at_startup
 log_level 4  # show prunings but not most scan bullshit at lvl 5
 
 schedule :every, 1.minutes do

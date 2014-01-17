@@ -8,7 +8,7 @@ export RUBYLIB="$PROJECT_ROOT/lib:$CLASSPATH"
 export GEM_HOME="$PROJECT_ROOT/target/rubygems"
 export PATH="$GEM_HOME/bin:$PATH"
 
-alias teeveed="$PROJECT_ROOT/bin/teeveed.rb --config $PROJECT_ROOT/config/test.teeveed.rb"
+alias teeveed="$PROJECT_ROOT/src/main/ruby/jar-bootstrap.rb --config $PROJECT_ROOT/config/test.teeveed.rb"
 alias cli="teeveed --cli"
 
 function rebuild {
