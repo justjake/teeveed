@@ -138,6 +138,14 @@ module Teevee
         return result
       end
 
+      # handle an error as middleware. Return nil to squash error.
+      #
+      # @param controller [Teevee::IntentController]
+      # @param error [StandardError]
+      def error_intent_handler(controller, error)
+        return error
+      end
+
     end # end Base
 
     # Plugins list with shorthand selectors

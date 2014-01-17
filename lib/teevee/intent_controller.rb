@@ -7,6 +7,9 @@ module Teevee
   # we haven't done this yet
   class Unimplemented < StandardError; end
 
+  # when there's not enough information in the intent to search
+  class NotEnoughData < StandardError; end
+
   # the IntentController takes an intnet and carries out the actions needed
   # to bring it to fruition
   class IntentController
@@ -23,16 +26,20 @@ module Teevee
     end
 
     def handle_intent(intent)
-      if self.respond_to? intent.type
         log 3, "Handling a #{intent.type.to_s} intent"
 
         plugins.each{|plg| intent = plg.before_intent_handler(self, intent)}
-        res = self.send(intent.type, intent)
+        begin
+          res = self.send(intent.type, intent)
+        # TODO: is there a more correct way to allow plugins to handle errors?
+        rescue StandardError => err
+          plugins.each{|plg| err = plg.error_intent_handler(self, err)}
+          raise err unless err.nil?
+        end
+
         plugins.each{|plg| res = plg.after_intent_handler(self, res)}
 
         return res
-      end
-      raise UnknownIntent, "Unknown intent: #{intent}"
     end
 
 

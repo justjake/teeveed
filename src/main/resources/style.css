@@ -14,7 +14,7 @@ Text {
     -fx-fill: #ccc;
 }
 
-.action, .result, .intent, .entity, .entity Text {
+.action, .result, .intent, .entity, .entity Text, .error .type {
     -fx-fill: #fff;
                            /* type, color, radius, spread, x, y */
     -fx-effect: dropshadow(gaussian, #999, 30, 0.1, 0, 0);
