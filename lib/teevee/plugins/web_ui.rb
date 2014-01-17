@@ -54,26 +54,29 @@ module Teevee
           haml :index
         end
 
+        get '/styles' do
+          scss :stylesheet
+        end
+
         post '/' do
           wit = Teevee::Wit::API.new(settings.wit_token)
           controller = Teevee::IntentController.new(settings.app)
 
           query = wit.query(params[:q])
-          intent_res = nil
+          res = nil
           if query.outcome.is_a? Wit::Intent
             begin
-              intent_res = controller.handle_intent(query.outcome)
-              intent_res = escape_html(intent_res.pretty_inspect)
+              res = controller.handle_intent(query.outcome)
             rescue UnknownIntent => err
-              intent_res = "UnknownIntent: #{escape_html(err.message)}"
+              res = "UnknownIntent: #{escape_html(err.message)}"
             rescue Unimplemented => err
-              intent_res = 'Unimplemented.'
+              res = 'Unimplemented.'
             end
           end
 
           haml :index, :locals => {
               :query => escape_html(query.pretty_inspect),
-              :result => escape_html(intent_res.pretty_inspect),
+              :result => escape_html((res.respond_to? :value ? res.value : res).pretty_inspect)
           }
         end
       end # end Server

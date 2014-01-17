@@ -3,18 +3,21 @@
   %head
     %title teeveed
     %meta(name="viewport" content="width=device-width")
-    %link(rel="icon" href="/teeveed-256.png")
+    %link(rel="icon"       href="/teeveed-256.png")
+    %link(rel="stylesheet" href="/styles" type="text/css")
   %body
+    %h1
+      %img(src="/teeveed-256.png" class="icon" alt="teevee icon")
     %form(action="" method="post")
-      %h2 Ask
       %input(type="text" name="q" style="width: 100%;")
-      %input(type="submit" name="send")
-    - if query
-      %div
-        %h2 Intent
-        %pre
-          %code
-            = query
-        - if result
-          %h2 Result
+      %input(type="submit" name="send" value="Go")
+  - if locals[:query]
+    %div
+      %h2 Intent
+      %pre
+        %code
+          = query
+      - if locals[:result]
+        %h2 Result
+        %code
           = result

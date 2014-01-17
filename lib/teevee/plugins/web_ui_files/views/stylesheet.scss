@@ -1,0 +1,70 @@
+$bg: #eee;
+$fg: #333;
+$padding: 2em;
+
+.special {
+  color: #fff;
+  text-shadow: 0px 1px 5px #999;
+  font-weight: normal;
+}
+
+/* a huge win for everyone */
+* {
+  box-sizing: border-box;
+  -mox-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  background: $fg;
+}
+
+body {
+  background: $bg;
+  font-family: sans-serif;
+  color: $fg;
+  padding: $padding;
+  font-size: 120%;
+  margin: 1em;
+  border: 1px solid #000;
+  border-radius: 5px;
+}
+
+input {
+  width: 100%;
+}
+
+input[type=text] {
+  font-size: 1.5em;
+  background: #333;
+  padding: 0.2em 0.2em;
+  border: 2px solid #000;
+  border-radius: 3px;
+  color: #ccc;
+  &:focus {
+    @extend .special;
+  }
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-weight: normal;
+}
+
+h2 {
+  margin: 1em 0 0.125em;
+}
+
+h1 {
+  font-size: 100%;
+  text-align: center;
+  margin: 0;
+  margin-bottom: 1.6em;
+}
+
+code {
+  font-size: 10px;
+  font-family: Monaco, monospace;
+}
+
