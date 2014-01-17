@@ -1,6 +1,6 @@
 $bg: #eee;
 $fg: #333;
-$padding: 2em;
+$padding: 1.5em;
 
 .special {
   color: #fff;
@@ -27,7 +27,7 @@ body {
   color: $fg;
   padding: $padding;
   font-size: 120%;
-  margin: 1em;
+  margin: .5em;
   border: 1px solid #000;
   border-radius: 5px;
 }
@@ -60,7 +60,7 @@ h1 {
   font-size: 100%;
   text-align: center;
   margin: 0;
-  margin-bottom: 1.6em;
+  margin-bottom: $padding - 0.2em;
 }
 
 code {
