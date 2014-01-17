@@ -72,6 +72,7 @@ module Teevee
     def self.main(args)
       opts = parse_options(args)
       Teevee.log_level = opts[:verbosity]
+      Teevee.log(1, 'boot', 'STARTING UP')
       Teevee.log(5, 'boot', 'loading user config...')
       config = Teevee::Daemon::ConfigDSL.load(opts[:config]).to_hash
 
@@ -85,6 +86,7 @@ module Teevee
       require 'teevee'
 
       ### teevee objects
+      Teevee.log(6, 'boot', 'resolving library class assignments')
       path = config[:root_specs].keys.first
       root_spec = config[:root_specs][path]
       # transform any symbols to Media sublcasses
@@ -99,6 +101,7 @@ module Teevee
       app = Teevee::Application.new(root, indexer, opts[:wit_token], opts)
 
       ### load plugins
+      Teevee.log(5, 'boot', 'loading plugins')
       config[:plugins_and_options].each do |name_opts|
         instance = Teevee::Plugin.load_and_instantiate(name_opts[0], app, name_opts[1])
         app.plugins << instance
