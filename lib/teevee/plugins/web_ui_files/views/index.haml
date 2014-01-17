@@ -1,0 +1,20 @@
+!!! 5
+%html
+  %head
+    %title teeveed
+    %meta(name="viewport" content="width=device-width")
+    %link(rel="icon" href="/teeveed-256.png")
+  %body
+    %form(action="" method="post")
+      %h2 Ask
+      %input(type="text" name="q" style="width: 100%;")
+      %input(type="submit" name="send")
+    - if query
+      %div
+        %h2 Intent
+        %pre
+          %code
+            = query
+        - if result
+          %h2 Result
+          = result

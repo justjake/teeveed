@@ -1,4 +1,5 @@
 # -*- encoding : utf-8 -*-
+require 'pp' # needed for #pretty_inspect
 require 'sinatra/base'
 require 'haml'
 
@@ -9,7 +10,7 @@ require 'haml'
 
 module Teevee
   module Plugins
-    class WebIU < Teevee::Plugin::Base
+    class WebUI < Teevee::Plugin::Base
       # @param app [Teevee::Application]
       # @param opts [Hash] options
       # @option opts :ip [String] IP address to listen on
@@ -36,71 +37,44 @@ module Teevee
       # Web-based remote control interface for requesting actions
       # right now all it does is pass a <textarea> to Wit.ai
       class Server < Sinatra::Base
+
+        set :root, File.join(File.dirname(__FILE__), 'web_ui_files')
+        set :server, :puma
+
         helpers do
-          def h(text)
+          def escape_html(text)
             Rack::Utils.escape_html(text)
           end
         end
 
-        ### TEMPLATES
-        # default template
-        HOMEPAGE = %q(
-!!! 5
-%html
-  %head
-    %title teeveed
-    %meta(name="viewport" content="width=device-width")
-  %body
-    %form(action="" method="post")
-      %h2 Ask
-      %textarea(name="q" style="width: 100%;")
-      %input(type="submit" name="send")
-)
-
-        # template showing a response, too
-        RESP = HOMEPAGE + %q(
-    %div
-      %h2 Intent
-      %pre
-        %code
-          = @intent_codez
-      - if @intent_res
-        %h2 Result
-        = @intent_res
-)
-        template :index do
-          HOMEPAGE
-        end
-
-        template :response do
-          RESP
-        end
 
         ### HTTP HANDLERS
 
         get '/' do
-          haml HOMEPAGE
+          haml :index
         end
 
         post '/' do
           wit = Teevee::Wit::API.new(settings.wit_token)
           controller = Teevee::IntentController.new(settings.app)
 
-          @query = wit.query(params[:q])
-          @intent_codez = h @query.pretty_inspect
-          @intent_res = nil
-          if @query.outcome.is_a? Wit::Intent
+          query = wit.query(params[:q])
+          intent_res = nil
+          if query.outcome.is_a? Wit::Intent
             begin
-              @intent_res = controller.handle_intent(@query.outcome)
-              @intent_res = h @intent_res.pretty_inspect
+              intent_res = controller.handle_intent(query.outcome)
+              intent_res = escape_html(intent_res.pretty_inspect)
             rescue UnknownIntent => err
-              @intent_res = "UnknownIntent: #{err.to_s}"
+              intent_res = "UnknownIntent: #{escape_html(err.message)}"
             rescue Unimplemented => err
-              @intent_res = 'Unimplemented.'
+              intent_res = 'Unimplemented.'
             end
           end
 
-          haml RESP
+          haml :index, :locals => {
+              :query => escape_html(query.pretty_inspect),
+              :result => escape_html(intent_res.pretty_inspect),
+          }
         end
       end # end Server
     end # end WebUI plugin
