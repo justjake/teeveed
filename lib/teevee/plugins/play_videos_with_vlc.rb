@@ -70,6 +70,7 @@ module Teevee
           # success!
           if movies.count > 0
             _vlc.with_vlc do |vlc|
+              vlc.clear
               vlc.play @app.root.abs_path(movies.first.relative_path)
             end
             return movies.first
