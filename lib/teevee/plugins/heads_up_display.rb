@@ -7,6 +7,14 @@ module Teevee
     # Including this plugin enables the on-screen display
     class HeadsUpDisplay < Teevee::Plugin::Base
 
+      DEFAULT_DURATION = 30
+
+      def initialize(app, opts)
+        opts ||= {}
+        super(app, opts)
+        @duration = opts[:duration] || DEFAULT_DURATION
+      end
+
       def run!
         HUD.start
       end
@@ -25,9 +33,20 @@ module Teevee
         hud = HUD.new
         hud.update do
           hud.push_results!(result)
-          hud.hide_in(30) # 30 seconds timeout
+          hud.hide_in(@duration) # 30 seconds timeout
         end
         return result
+      end
+
+      def error_intent_handler(controller, error)
+        unless error.nil?
+          hud = HUD.new
+          hud.update do
+            hud.push_error!(error)
+            hud.hide_in(@duration)
+          end
+        end
+        error
       end
 
       # the HUD class manages a single instance of the JavaFX on-screen display
@@ -146,12 +165,17 @@ module Teevee
               styled_intent << [RIGHT_ARROW]
               styled_intent << [intent.entities[:action].value, 'action']
             end
-            styled_intent << ["with #{intent.confidence} confidence"] if intent.confidence < 0.7
+            styled_intent << ["with only #{intent.confidence} confidence"] if intent.confidence < 0.7
           end
           body = _intent_to_alert(intent)
 
           push_alert!(['small'], *styled_intent)
           push_alert!(['large'], *body)
+        end
+
+        def push_error!(error)
+          push_alert!(['large', 'error'], ['Error:'], [error.class.to_s.split('::').last, 'type'])
+          push_alert!(['small', 'error'], [error.message, 'message'])
         end
 
 
