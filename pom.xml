@@ -4,7 +4,7 @@
 
   <groupId>org.teton_landis.jake.teeveed</groupId>
   <artifactId>teeveed</artifactId>
-  <version>0.3.0-SNAPSHOT-sequel</version>
+  <version>0.3.0-SNAPSHOT-plugins</version>
   <packaging>jar</packaging>
 
   <name>teeveed</name>
