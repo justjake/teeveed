@@ -65,12 +65,18 @@ module Teevee
         def query_movie(intent)
           # fuzzy matching stuff
 
+          # we need data to search on
+          unless intent.entities.include? :year or intent.entities.include? :title
+            raise NotEnoughData, 'cannot find movie without a title or year'
+          end
+
           movies = Teevee::Library::Movie.dataset
 
           # filter on year
           if intent.entities.include? :year
             year = intent.entities[:title].value.to_i
             movies = movies.where(:year => year)
+            log 4, "found #{movies.count} year=#{year}"
           end
 
           # filter on title
@@ -95,6 +101,12 @@ module Teevee
         end
 
         def query_episode(intent)
+
+          # ensure we have some data
+          unless [:season, :episode, :show, :title].any? {|ent| intent.entities.include? ent}
+            raise NotEnoughData, 'cannot search for an episode without an informational entity'
+          end
+
           # build query from definite paramters
           # maps from wit_entity_name to database_column
           name_mapping = {
