@@ -76,7 +76,7 @@ module Teevee
 
           haml :index, :locals => {
               :query => escape_html(query.pretty_inspect),
-              :result => escape_html((res.respond_to? :value ? res.value : res).pretty_inspect)
+              :result => escape_html(res.pretty_inspect)
           }
         end
       end # end Server
