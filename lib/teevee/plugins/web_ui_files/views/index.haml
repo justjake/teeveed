@@ -5,11 +5,16 @@
     %meta(name="viewport" content="width=device-width")
     %link(rel="icon"       href="/teeveed-256.png")
     %link(rel="stylesheet" href="/styles" type="text/css")
+
+    // webapp
+    %script(src="/annyang.js" type="text/javascript")
+    %script(src="/app" type="text/javascript")
+
   %body
     %h1
       %img(src="/teeveed-256.png" class="icon" alt="teevee icon")
-    %form(action="" method="post")
-      %input(type="text" name="q" style="width: 100%;")
+    %form(action="" method="post" id="form")
+      %input(type="text" name="q" id="q" style="width: 100%;" placeholder="say 'Okay TV' and a command, or type...")
       %input(type="submit" name="send" value="Go")
   - if locals[:query]
     %div

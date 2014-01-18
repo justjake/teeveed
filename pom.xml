@@ -111,12 +111,6 @@
     </dependency>
 
     <!-- webapps -->
-    <dependency>
-      <groupId>rubygems</groupId>
-      <artifactId>haml</artifactId>
-      <version>4.0.5</version>
-      <type>gem</type>
-    </dependency>
 
     <dependency>
       <groupId>rubygems</groupId>
@@ -132,12 +126,44 @@
       <type>gem</type>
     </dependency>
 
+    <!-- compilers: may be able to pre-compile resources and skip
+         deploying these and JITing the files they work on -->
     <dependency>
       <groupId>rubygems</groupId>
       <artifactId>sass</artifactId>
       <version>3.2.13</version>
       <type>gem</type>
     </dependency>
+
+    <dependency>
+      <groupId>rubygems</groupId>
+      <artifactId>haml</artifactId>
+      <version>4.0.5</version>
+      <type>gem</type>
+    </dependency>
+
+    <dependency>
+      <groupId>rubygems</groupId>
+      <artifactId>therubyrhino</artifactId>
+      <version>2.0.2</version>
+      <type>gem</type>
+    </dependency>
+
+    <dependency>
+      <groupId>rubygems</groupId>
+      <artifactId>coffee-script</artifactId>
+      <version>2.2.0</version>
+      <type>gem</type>
+    </dependency>
+
+    <dependency>
+      <groupId>rubygems</groupId>
+      <artifactId>therubyrhino</artifactId>
+      <version>2.0.2</version>
+      <type>gem</type>
+    </dependency>
+
+
 
     <!-- debugging -->
     <dependency>

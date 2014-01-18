@@ -1,8 +1,13 @@
 # -*- encoding : utf-8 -*-
+plugin_name = 'Teevee::Plugins::WebUI'
+
+Teevee.log(5, plugin_name, 'loading dependencies')
 require 'pp' # needed for #pretty_inspect
 require 'sinatra/base'
 require 'haml'
 require 'sass'
+require 'coffee-script'
+Teevee.log(5, plugin_name, 'finished dependencies')
 
 # Core plugin.
 # receives text from users via their smartphones, and then
@@ -57,6 +62,10 @@ module Teevee
 
         get '/styles' do
           scss :stylesheet
+        end
+
+        get '/app' do
+          coffee :app
         end
 
         post '/' do
