@@ -128,6 +128,7 @@
 
     <!-- compilers: may be able to pre-compile resources and skip
          deploying these and JITing the files they work on -->
+
     <dependency>
       <groupId>rubygems</groupId>
       <artifactId>sass</artifactId>
@@ -155,14 +156,6 @@
       <version>2.2.0</version>
       <type>gem</type>
     </dependency>
-
-    <dependency>
-      <groupId>rubygems</groupId>
-      <artifactId>therubyrhino</artifactId>
-      <version>2.0.2</version>
-      <type>gem</type>
-    </dependency>
-
 
 
     <!-- debugging -->
