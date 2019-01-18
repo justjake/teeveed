@@ -3,11 +3,17 @@
 
 natural language daemon for the media center.
 
-My winter break project (12/28/13 - 1/10/14) by [@jitl](https://twitter.com/@jitl)
+This was my winter break project winter from 12/28/13 - 1/10/14, and
+now development has ceased. See [the writeup on
+jake.tl](//https://jake.tl/projects/teeveed/).
+
+The original README and notes are preserved below.
+
+---
 
 ## What it does
 
-**teeveed** is a media center daeon you control with your voice. Right now, you talk to it with your smartphone's
+**teeveed** is a media center daemon you control with your voice. Right now, you talk to it with your smartphone's
 web browser. You tell teeveed to play a movie or an episode of a show you want to see that you have on your share, and it
 opens VLC for you.
 
