@@ -5,7 +5,7 @@ natural language daemon for the media center.
 
 This was my winter break project winter from 12/28/13 - 1/10/14, and
 now development has ceased. See [the writeup on
-jake.tl](//https://jake.tl/projects/teeveed/).
+jake.tl](https://jake.tl/projects/teeveed/).
 
 The original README and notes are preserved below.
 
